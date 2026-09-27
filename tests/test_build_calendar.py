@@ -1,0 +1,504 @@
+import io
+import json
+import sys
+import tempfile
+import unittest
+from contextlib import redirect_stderr, redirect_stdout
+from datetime import date, datetime, timedelta, timezone
+from pathlib import Path
+from unittest import mock
+from zoneinfo import ZoneInfo
+
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+
+import build_calendar as bc
+
+FIXTURES = Path(__file__).resolve().parent / "fixtures"
+TZ = ZoneInfo("America/Los_Angeles")
+TEAM, CODE = "Vintage Vikings", "VVI"
+NOW = datetime(2026, 9, 27, 18, 0, tzinfo=timezone.utc)  # Sunday 11am PDT
+CONFIG = {
+    "team": TEAM, "team_code": CODE, "calendar_name": "Vintage Vikings Soccer", "timezone": "America/Los_Angeles",
+    "site": "https://www.ggwsl.org", "game_minutes": 90, "keep_seasons": 4, "output": "docs/vikings.ics",
+    "state_file": "state.json", "venues_file": "venues.json", "cache_dir": "seasons",
+}
+
+
+def fixture(name):
+    return (FIXTURES / name).read_text(encoding="utf-8")
+
+
+def game(code="G0_VVI_WAS", start=datetime(2026, 9, 27, 15, 0, tzinfo=TZ), home=True, opponent="Wasabi", opponent_code="WAS",
+         result="", ours=None, theirs=None, status="scheduled", season="2026f", venue_code="BEA", **kwargs):
+    return bc.Game(code=code, season=season, start=start, field="Beach #4 (Turf)", venue_code=venue_code, opponent=opponent,
+                   opponent_code=opponent_code, home=home, result=result, our_score=ours, their_score=theirs,
+                   status=status, **kwargs)
+
+
+def row(code, name, rank, wins=0, losses=0, draws=0, gf=0, ga=0, points=None):
+    played = wins + losses + draws
+    return bc.Standing(code, name, rank, played, wins, losses, draws, 0, gf, ga, gf - ga,
+                       wins * 3 + draws if points is None else points)
+
+
+STANDINGS = bc.Standings([
+    row("KIL", "Killer Tomatoes", 1, wins=2, gf=15, ga=1),
+    row("WAS", "Wasabi", 2, wins=2, gf=8, ga=4),
+    row("VVI", "Elliott's Vintage Vikings", 4, losses=1, draws=1, gf=2, ga=3),
+])
+
+
+def season(games, standings=STANDINGS, snapshots=None, code="2026f"):
+    return bc.Season(code=code, name="Fall 2026", games=games, standings=standings, snapshots=snapshots or {})
+
+
+# ------------------------------------------------------------------------------ parsing
+
+
+class TeamPageTests(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.page = bc.parse_team_page(fixture("team_2026f.html"), CODE, TZ)
+
+    def test_season_and_listing(self):
+        self.assertEqual(self.page.current, "2026f")
+        self.assertEqual(self.page.season.name, "Fall 2026")
+        self.assertEqual(self.page.seasons[:3], [("2026f", "Fall 2026"), ("2026s", "Spring 2026"), ("2025f", "Fall 2025")])
+        self.assertEqual(self.page.seasons[-1], ("2009f", "Fall 2009"))
+
+    def test_schedule_rows(self):
+        games = self.page.season.games
+        self.assertEqual(len(games), 10)
+        first = games[0]
+        self.assertEqual(first.code, "G0_WAS_VVI")
+        self.assertEqual(first.start, datetime(2026, 9, 13, 13, 0, tzinfo=TZ))
+        self.assertFalse(first.home)
+        self.assertEqual((first.opponent, first.opponent_code), ("Wasabi", "WAS"))
+        self.assertEqual((first.field, first.venue_code), ("Beach #4 (Turf)", "BEA"))
+        self.assertEqual((first.result, first.our_score, first.their_score), ("L", "2", "3"))
+        self.assertEqual((first.competition, first.status, first.forfeit, first.all_day), ("league", "scheduled", False, False))
+
+    def test_bold_rows_are_home_games(self):
+        self.assertEqual([g.home for g in self.page.season.games],
+                         [False, True, False, False, False, True, True, False, True, True])
+
+    def test_morning_and_afternoon_kickoffs(self):
+        self.assertEqual([g.start.strftime("%H:%M") for g in self.page.season.games[:5]],
+                         ["13:00", "11:00", "15:00", "15:00", "09:00"])
+
+    def test_unplayed_game_has_no_result(self):
+        game = self.page.season.games[2]
+        self.assertEqual((game.result, game.our_score, game.their_score), ("", None, None))
+        self.assertEqual(game.venue_code, "ALA")
+
+    def test_standings_keep_only_teams_on_our_schedule_in_league_order(self):
+        rows = self.page.season.standings.rows
+        self.assertEqual([r.code for r in rows], ["KIL", "WAS", "FRU", "VVI", "SPI", "OFL"])
+        self.assertEqual([r.rank for r in rows], [1, 2, 3, 4, 5, 6])
+        kil = rows[0]
+        # The league caps goal difference, so GD is taken from the page rather than computed.
+        self.assertEqual((kil.played, kil.wins, kil.goals_for, kil.goals_against, kil.goal_diff, kil.points), (2, 2, 15, 1, 10, 6))
+        self.assertEqual(rows[3].record, "0-1-1")
+
+    def test_opponents_from_other_groups_are_unranked(self):
+        rows = bc.parse_team_page(fixture("team_2024f.html"), CODE, TZ).season.standings.rows
+        self.assertEqual([(r.code, r.rank) for r in rows],
+                         [("FRU", 1), ("WAS", 2), ("KIL", 3), ("VVI", 4), ("OFL", 5), ("SPI", 6), ("HFL", None)])
+
+    def test_forfeit_and_noon_kickoff(self):
+        games = bc.parse_team_page(fixture("team_2024f.html"), CODE, TZ).season.games
+        forfeit = next(g for g in games if g.forfeit)
+        self.assertEqual((forfeit.result, forfeit.our_score, forfeit.their_score), ("W", "2", "FF"))
+        self.assertEqual(forfeit.start, datetime(2024, 10, 27, 12, 0, tzinfo=TZ))
+
+    def test_wrong_team_fails(self):
+        with self.assertRaisesRegex(bc.PageError, "not for team WAS"):
+            bc.parse_team_page(fixture("team_2026f.html"), "WAS", TZ)
+
+    def test_error_page_fails(self):
+        with self.assertRaises(bc.PageError):
+            bc.parse_team_page("<html><body>No such team</body></html>", CODE, TZ)
+
+    def test_missing_schedule_fails_unless_allowed(self):
+        html = fixture("team_2026f.html").replace(">\nOPPONENT\n<", ">\nFOE\n<")
+        with self.assertRaisesRegex(bc.PageError, "schedule table"):
+            bc.parse_team_page(html, CODE, TZ)
+        self.assertEqual(bc.parse_team_page(html, CODE, TZ, require_schedule=False).season.games, [])
+
+    def test_home_marking_must_match_game_code(self):
+        html = fixture("team_2026f.html").replace("G0_WAS_VVI", "G0_VVI_WAS", 2)
+        with self.assertRaisesRegex(bc.PageError, "bold"):
+            bc.parse_team_page(html, CODE, TZ)
+
+    def test_unexpected_row_shape_fails(self):
+        html = fixture("team_2026f.html").replace(">league</a></td>", ">league</a></td><td>extra</td>", 1)
+        with self.assertRaisesRegex(bc.PageError, "unexpected schedule row"):
+            bc.parse_team_page(html, CODE, TZ)
+
+
+class FieldParsingTests(unittest.TestCase):
+    def test_time_am_pm(self):
+        self.assertEqual(bc.parse_time("9:00"), (9, 0))
+        self.assertEqual(bc.parse_time("11:00"), (11, 0))
+        self.assertEqual(bc.parse_time("12:00"), (12, 0))
+        self.assertEqual(bc.parse_time("1:00"), (13, 0))
+        self.assertEqual(bc.parse_time("10:15"), (10, 15))
+        self.assertEqual(bc.parse_time("7:30"), (19, 30))
+        self.assertIsNone(bc.parse_time(""))
+
+    def test_implausible_time_fails(self):
+        for value in ("13:00", "0:30", "noon"):
+            with self.assertRaises(bc.PageError):
+                bc.parse_time(value)
+
+    def test_date_is_checked_against_weekday(self):
+        self.assertEqual(bc.parse_date("Sun", "Sep. 13", 2026), date(2026, 9, 13))
+        self.assertEqual(bc.parse_date("Sat", "May. 16", 2026), date(2026, 5, 16))
+        self.assertEqual(bc.parse_date("Sun", "Sept. 13", 2026), date(2026, 9, 13))
+        with self.assertRaisesRegex(bc.PageError, "Sunday"):
+            bc.parse_date("Sat", "Sep. 13", 2026)
+        with self.assertRaises(bc.PageError):
+            bc.parse_date("Sun", "Smarch 3", 2026)
+
+    def test_scores(self):
+        self.assertEqual(bc.parse_score("2-3"), ("2", "3"))
+        self.assertEqual(bc.parse_score("2-FF"), ("2", "FF"))
+        self.assertEqual(bc.parse_score(""), (None, None))
+        self.assertEqual(bc.parse_score("--"), (None, None))
+        self.assertEqual(bc.parse_score("CCD"), (None, None))
+        with self.assertRaises(bc.PageError):
+            bc.parse_score("2:3")
+
+    def test_results(self):
+        self.assertEqual(bc.parse_result("W", "2", "1", "scheduled"), ("W", False))
+        self.assertEqual(bc.parse_result("", "2", "2", "scheduled"), ("D", False))
+        self.assertEqual(bc.parse_result("", None, None, "scheduled"), ("", False))
+        self.assertEqual(bc.parse_result("--", None, None, "rainout"), ("", False))
+        self.assertEqual(bc.parse_result("W", "2", "FF", "scheduled"), ("W", True))
+        self.assertEqual(bc.parse_result("FF", "0", "2", "earlyforfeit"), ("L", True))
+        self.assertEqual(bc.parse_result("W", "5", "2", "earlyforfeit"), ("W", True))
+        self.assertEqual(bc.parse_result("CCD", "1", "0", "scheduled"), ("CCD", False))
+
+    def test_venue_address(self):
+        self.assertEqual(bc.parse_venue(fixture("venue_BEA.html"), "BEA"),
+                         "Beach Chalet, 1500 John F Kennedy, Golden Gate Park, San Francisco, CA")
+        self.assertIsNone(bc.parse_venue(fixture("venue_BEA.html"), "ALA"))
+
+
+# ----------------------------------------------------------------------------- rendering
+
+
+class SummaryTests(unittest.TestCase):
+    def test_upcoming_home_and_away(self):
+        self.assertEqual(bc.build_summary(game(), TEAM, CODE, False, None), "Vintage Vikings vs Wasabi")
+        self.assertEqual(bc.build_summary(game(home=False), TEAM, CODE, False, None), "Wasabi vs Vintage Vikings")
+
+    def test_featured_game_shows_rank_and_record_home_first(self):
+        g = game(home=False, opponent="Killer Tomatoes", opponent_code="KIL")
+        self.assertEqual(bc.build_summary(g, TEAM, CODE, True, STANDINGS), "Killer Tomatoes (1st, 2-0) vs Vintage Vikings (4th, 0-1-1)")
+
+    def test_featured_opponent_from_another_group_shows_record_only(self):
+        standings = bc.Standings(STANDINGS.rows + [bc.Standing("HFL", "Hot Flashes", None, 8, 5, 3, 0, 2, 22, 15, 6, 11)])
+        g = game(opponent="Hot Flashes", opponent_code="HFL")
+        self.assertEqual(bc.build_summary(g, TEAM, CODE, True, standings), "Vintage Vikings (4th, 0-1-1) vs Hot Flashes (5-3)")
+
+    def test_result_home_first_with_our_perspective_letter(self):
+        g = game(home=False, result="L", ours="2", theirs="3")
+        self.assertEqual(bc.build_summary(g, TEAM, CODE, False, None), "Wasabi 3 - 2 Vintage Vikings (L)")
+        g = game(result="D", ours="0", theirs="0")
+        self.assertEqual(bc.build_summary(g, TEAM, CODE, False, None), "Vintage Vikings 0 - 0 Wasabi (D)")
+
+    def test_forfeit(self):
+        g = game(home=False, result="W", ours="2", theirs="FF", forfeit=True)
+        self.assertEqual(bc.build_summary(g, TEAM, CODE, False, None), "Wasabi FF - 2 Vintage Vikings (W, forfeit)")
+
+    def test_result_without_score(self):
+        g = game(result="CCD")
+        self.assertEqual(bc.build_summary(g, TEAM, CODE, False, None), "Vintage Vikings vs Wasabi (CCD)")
+
+    def test_called_off_games(self):
+        self.assertEqual(bc.build_summary(game(status="rainout"), TEAM, CODE, False, None), "RAINED OUT: Vintage Vikings vs Wasabi")
+        self.assertEqual(bc.build_summary(game(status="cancelled"), TEAM, CODE, True, STANDINGS), "CANCELLED: Vintage Vikings (4th, 0-1-1) vs Wasabi (2nd, 2-0)")
+        self.assertEqual(bc.build_summary(game(status="postpnd"), TEAM, CODE, False, None), "POSTPONED: Vintage Vikings vs Wasabi")
+        self.assertEqual(bc.build_summary(game(status="mystery"), TEAM, CODE, False, None), "MYSTERY: Vintage Vikings vs Wasabi")
+
+    def test_non_league_competition_is_labelled(self):
+        self.assertEqual(bc.build_summary(game(competition="cup"), TEAM, CODE, False, None), "Cup: Vintage Vikings vs Wasabi")
+
+
+class DescriptionTests(unittest.TestCase):
+    def test_upcoming(self):
+        text = bc.build_description(game(), TEAM, CODE, None, "Standings and records are added the week of the game.")
+        self.assertEqual(text, "Vintage Vikings (home) vs Wasabi (away)\nBeach #4 (Turf)\n\nStandings and records are added the week of the game.")
+
+    def test_played_with_table_uses_display_name(self):
+        g = game(result="W", ours="2", theirs="1")
+        text = bc.build_description(g, TEAM, CODE, STANDINGS)
+        self.assertIn("Final: Vintage Vikings 2 - 1 Wasabi (W)", text)
+        self.assertIn("Standings after this game:\n1. Killer Tomatoes 2-0, 6 pts, GD +14", text)
+        self.assertIn("4. Vintage Vikings 0-1-1, 1 pts, GD -1", text)  # rank as the table has it
+        self.assertNotIn("Elliott", text)
+
+    def test_other_group_listed_after_our_group(self):
+        standings = bc.Standings(STANDINGS.rows + [bc.Standing("HFL", "Hot Flashes", None, 8, 5, 3, 0, 2, 22, 15, 6, 11)])
+        text = bc.build_description(game(result="W", ours="2", theirs="1"), TEAM, CODE, standings)
+        self.assertTrue(text.endswith("4. Vintage Vikings 0-1-1, 1 pts, GD -1\nOther groups:\n- Hot Flashes 5-3, 11 pts, GD +6"))
+
+    def test_rained_out_and_time_tbd(self):
+        text = bc.build_description(game(status="rainout", all_day=True), TEAM, CODE, None)
+        self.assertEqual(text, "Status: Rained out\nVintage Vikings (home) vs Wasabi (away)\nBeach #4 (Turf)\nKickoff time not set yet.")
+
+
+class StandingsChoiceTests(unittest.TestCase):
+    def test_played_game_uses_its_snapshot(self):
+        played = game(result="W", ours="1", theirs="0")
+        snap = bc.Standings([row("VVI", "V", 1, wins=1)])
+        table, note = bc.standings_for(played, season([played, game(code="G1")], snapshots={played.code: snap}), False, NOW)
+        self.assertIs(table, snap)
+        self.assertIsNone(note)
+
+    def test_played_game_without_snapshot_has_no_table(self):
+        played = game(result="W", ours="1", theirs="0")
+        self.assertEqual(bc.standings_for(played, season([played, game(code="G1")]), False, NOW), (None, None))
+
+    def test_last_game_of_finished_season_falls_back_to_final_table(self):
+        first = game(code="G0", start=datetime(2026, 5, 3, 9, tzinfo=TZ), result="W", ours="1", theirs="0")
+        last = game(code="G1", start=datetime(2026, 5, 10, 9, tzinfo=TZ), result="L", ours="0", theirs="1")
+        s = season([first, last])
+        self.assertIs(bc.table_after(last, s), STANDINGS)
+        self.assertIsNone(bc.table_after(first, s))
+
+    def test_featured_game_notes(self):
+        g = game()
+        self.assertEqual(bc.standings_for(g, season([g]), True, NOW), (STANDINGS, None))
+        empty = bc.Standings([row("VVI", "V", 1), row("WAS", "W", 2)])
+        self.assertEqual(bc.standings_for(g, season([g], standings=empty), True, NOW), (None, "No games played yet this season."))
+
+    def test_other_game_notes(self):
+        past = game(start=datetime(2026, 9, 20, 11, tzinfo=TZ))
+        future = game(start=datetime(2026, 10, 25, 15, tzinfo=TZ))
+        self.assertEqual(bc.standings_for(past, season([past]), False, NOW), (None, "Result not posted yet."))
+        self.assertEqual(bc.standings_for(future, season([future]), False, NOW), (None, "Standings and records are added the week of the game."))
+        self.assertEqual(bc.standings_for(game(status="rainout"), season([]), False, NOW), (None, None))
+
+    def test_pick_featured(self):
+        done = game(code="A", start=datetime(2026, 9, 20, 11, tzinfo=TZ), result="D", ours="0", theirs="0")
+        rained = game(code="B", start=datetime(2026, 9, 27, 9, tzinfo=TZ), status="rainout")
+        today = game(code="C", start=datetime(2026, 9, 27, 15, tzinfo=TZ))
+        later = game(code="D", start=datetime(2026, 10, 4, 15, tzinfo=TZ))
+        self.assertIs(bc.pick_featured([done, rained, today, later], NOW), today)
+        self.assertIsNone(bc.pick_featured([later], NOW - timedelta(days=10)))
+
+
+class SnapshotTests(unittest.TestCase):
+    def setUp(self):
+        self.first = game(code="G0", start=datetime(2026, 9, 13, 13, tzinfo=TZ), result="L", ours="2", theirs="3")
+        self.second = game(code="G1", start=datetime(2026, 9, 20, 11, tzinfo=TZ), result="D", ours="0", theirs="0")
+        self.third = game(code="G2", start=datetime(2026, 9, 27, 15, tzinfo=TZ))
+        self.season = season([self.first, self.second, self.third])
+
+    def test_records_table_for_this_weeks_result_only(self):
+        result = bc.record_snapshots(self.season, {}, date(2026, 9, 21))
+        self.assertEqual(set(result.snapshots), {"G1"})
+
+    def test_window_ends_the_day_before_our_next_game(self):
+        self.assertEqual(bc.record_snapshots(self.season, {}, date(2026, 9, 26)).snapshots.keys(), {"G1"})
+        self.assertEqual(bc.record_snapshots(self.season, {}, date(2026, 9, 27)).snapshots, {})
+
+    def test_frozen_snapshots_are_kept_and_removed_games_dropped(self):
+        old = bc.Standings([row("VVI", "V", 1)])
+        result = bc.record_snapshots(self.season, {"G0": old, "GONE": old}, date(2026, 9, 21))
+        self.assertIs(result.snapshots["G0"], old)
+        self.assertNotIn("GONE", result.snapshots)
+        self.assertIs(result.snapshots["G1"], STANDINGS)
+
+
+class LiveSeasonTests(unittest.TestCase):
+    def test_rules(self):
+        finished = season([game(start=datetime(2026, 6, 7, 13, tzinfo=TZ))], code="2026s")
+        today = date(2026, 6, 21)
+        self.assertTrue(bc.season_is_live("2026f", "2026f", finished, today))  # the current season
+        self.assertTrue(bc.season_is_live("2026s", "2026f", None, today))  # not cached yet
+        self.assertTrue(bc.season_is_live("2026s", "2026f", season([], code="2026s"), today))  # no schedule yet
+        self.assertTrue(bc.season_is_live("2026s", "2026f", finished, today))  # within 14 days of its last game
+        self.assertFalse(bc.season_is_live("2026s", "2026f", finished, today + timedelta(days=1)))
+
+
+class CacheTests(unittest.TestCase):
+    def test_round_trip(self):
+        original = bc.parse_team_page(fixture("team_2026f.html"), CODE, TZ).season
+        original = bc.Season(original.code, original.name, original.games + [game(code="G9", all_day=True, start=datetime(2026, 12, 6, tzinfo=TZ))],
+                             original.standings, {"G0_WAS_VVI": original.standings})
+        restored = bc.season_from_json(json.loads(json.dumps(bc.season_to_json(original))), TZ)
+        self.assertEqual(restored, original)
+
+
+class IcsTests(unittest.TestCase):
+    def test_fold_respects_octets_and_utf8(self):
+        line = "DESCRIPTION:" + "é" * 80
+        folded = bc.ics_fold(line)
+        self.assertTrue(all(len(part.encode("utf-8")) <= 75 for part in folded))
+        self.assertEqual("".join(p[1:] if i else p for i, p in enumerate(folded)), line)
+
+    def test_escape(self):
+        self.assertEqual(bc.ics_escape("a, b; c\\d\ne"), "a\\, b\\; c\\\\d\\ne")
+
+    def test_timed_and_all_day_events(self):
+        length = timedelta(minutes=90)
+        self.assertEqual(bc.event_times(game(), length), ["DTSTART:20260927T220000Z", "DTEND:20260927T233000Z"])
+        all_day = game(all_day=True, start=datetime(2026, 12, 6, tzinfo=TZ))
+        self.assertEqual(bc.event_times(all_day, length), ["DTSTART;VALUE=DATE:20261206", "DTEND;VALUE=DATE:20261207"])
+
+    def test_pst_after_daylight_saving_ends(self):
+        g = game(start=datetime(2026, 11, 22, 15, tzinfo=TZ))
+        self.assertEqual(bc.event_times(g, timedelta(minutes=90))[0], "DTSTART:20261122T230000Z")
+
+
+class BuildTests(unittest.TestCase):
+    def setUp(self):
+        self.played = game(code="G0_WAS_VVI", home=False, start=datetime(2026, 9, 20, 11, tzinfo=TZ), result="L", ours="2", theirs="3")
+        self.today = game(code="G0_KIL_VVI", home=False, opponent="Killer Tomatoes", opponent_code="KIL", venue_code="ALA")
+        self.seasons = [season([self.played, self.today])]
+        self.venues = {"BEA": "Beach Chalet, 1500 John F Kennedy, San Francisco, CA"}
+
+    def events(self, calendar):
+        unfolded = calendar.replace("\r\n ", "")
+        return [dict(line.split(":", 1) for line in block.split("\r\n") if ":" in line)
+                for block in unfolded.split("BEGIN:VEVENT")[1:]]
+
+    def test_calendar(self):
+        calendar, state = bc.build(CONFIG, self.seasons, self.venues, {}, NOW)
+        self.assertTrue(calendar.startswith("BEGIN:VCALENDAR\r\n"))
+        self.assertIn("X-WR-CALNAME:Vintage Vikings Soccer\r\n", calendar)
+        played, today = self.events(calendar)
+        self.assertEqual(played["UID"], "ggwsl-2026f-G0_WAS_VVI@vikings-calendar")
+        self.assertEqual(played["SUMMARY"], "Wasabi 3 - 2 Vintage Vikings (L)")
+        self.assertEqual(played["LOCATION"], "Beach Chalet\\, 1500 John F Kennedy\\, San Francisco\\, CA")
+        self.assertEqual(today["SUMMARY"], "Killer Tomatoes (1st\\, 2-0) vs Vintage Vikings (4th\\, 0-1-1)")
+        self.assertEqual(today["LOCATION"], "Beach #4 (Turf)")  # venue address not known: field name
+        self.assertEqual(today["DTEND"], "20260927T233000Z")
+        self.assertEqual(set(state), {played["UID"], today["UID"]})
+
+    def test_sequence_only_bumps_on_change(self):
+        _, state = bc.build(CONFIG, self.seasons, self.venues, {}, NOW)
+        later = NOW + timedelta(hours=6)
+        _, same = bc.build(CONFIG, self.seasons, self.venues, state, later)
+        self.assertEqual(same, state)
+        moved = game(code="G0_KIL_VVI", home=False, opponent="Killer Tomatoes", opponent_code="KIL", start=datetime(2026, 9, 27, 13, tzinfo=TZ))
+        _, changed = bc.build(CONFIG, [season([self.played, moved])], self.venues, state, later)
+        uid = "ggwsl-2026f-G0_KIL_VVI@vikings-calendar"
+        self.assertEqual(changed[uid]["sequence"], 1)
+        self.assertEqual(changed[uid]["last_modified"], later.isoformat())
+
+    def test_cancelled_status(self):
+        calendar, _ = bc.build(CONFIG, [season([game(status="rainout")])], {}, {}, NOW)
+        self.assertEqual(self.events(calendar)[0]["STATUS"], "CANCELLED")
+
+
+# ---------------------------------------------------------------------------- loading
+
+
+class FakeSite:
+    """Serves fixture pages by URL and records what was fetched."""
+
+    def __init__(self, pages):
+        self.pages = pages
+        self.fetched = []
+
+    def __call__(self, url):
+        self.fetched.append(url)
+        if url not in self.pages:
+            raise AssertionError(f"unexpected fetch {url}")
+        return self.pages[url]
+
+
+CURRENT_URL = "https://www.ggwsl.org/LibLeague/Team/Team.php?PARAM_TEAM_CODE=VVI"
+
+
+def season_url(code):
+    return f"{CURRENT_URL}+PARAM_SEASON_CODE={code}"
+
+
+class LoadSeasonsTests(unittest.TestCase):
+    def setUp(self):
+        self.dir = tempfile.TemporaryDirectory()
+        self.cache = Path(self.dir.name)
+        self.addCleanup(self.dir.cleanup)
+        self.today = date(2026, 9, 27)
+        self.config = {**CONFIG, "keep_seasons": 2}
+        # Stand-in for the spring page: the fall page relabelled. Same year, so its dates still check out.
+        self.spring = fixture("team_2026f.html").replace('value="2026f" selected>', 'value="2026f">').replace('value="2026s">', 'value="2026s" selected>')
+
+    def cached(self, code, last_game):
+        s = season([game(season=code, start=datetime.combine(last_game, datetime.min.time(), TZ).replace(hour=13))], code=code)
+        (self.cache / f"{code}.json").write_text(json.dumps(bc.season_to_json(s)))
+
+    def test_fetches_current_and_uncached_seasons(self):
+        site = FakeSite({CURRENT_URL: fixture("team_2026f.html"), season_url("2026s"): self.spring})
+        with mock.patch.object(bc, "fetch_text", site):
+            seasons, stale = bc.load_seasons(self.config, self.cache, self.today, TZ)
+        self.assertEqual(site.fetched, [CURRENT_URL, season_url("2026s")])
+        self.assertEqual(stale, [])
+        self.assertEqual({s.code for s in seasons}, {"2026f", "2026s"})
+
+    def test_serves_finished_seasons_from_cache_and_drops_old_ones(self):
+        self.cached("2026s", date(2026, 6, 7))
+        self.cached("2025f", date(2025, 11, 23))
+        site = FakeSite({CURRENT_URL: fixture("team_2026f.html")})
+        with mock.patch.object(bc, "fetch_text", site):
+            seasons, stale = bc.load_seasons(self.config, self.cache, self.today, TZ)
+        self.assertEqual(site.fetched, [CURRENT_URL])
+        self.assertEqual(stale, ["2025f"])
+        self.assertEqual({s.code for s in seasons}, {"2026f", "2026s"})
+
+    def test_page_for_the_wrong_season_fails(self):
+        site = FakeSite({CURRENT_URL: fixture("team_2026f.html"), season_url("2026s"): fixture("team_2024f.html")})
+        with mock.patch.object(bc, "fetch_text", site), self.assertRaisesRegex(bc.PageError, "shows 2024f"):
+            bc.load_seasons(self.config, self.cache, self.today, TZ)
+
+    def test_venues_fetched_once(self):
+        site = FakeSite({"https://www.ggwsl.org/LibLeague/Direct.php?PARAM_VENUE_CODE=BEA": fixture("venue_BEA.html"),
+                         "https://www.ggwsl.org/LibLeague/Direct.php?PARAM_VENUE_CODE=ALA": "<html></html>"})
+        games = [game(), game(code="X", venue_code="ALA"), game(code="Y", venue_code="OLD")]
+        with mock.patch.object(bc, "fetch_text", site), redirect_stderr(io.StringIO()) as err:
+            venues = bc.load_venues(CONFIG, {"OLD": "Old Field"}, games)
+        self.assertEqual(venues, {"OLD": "Old Field", "BEA": "Beach Chalet, 1500 John F Kennedy, Golden Gate Park, San Francisco, CA"})
+        self.assertIn("ALA", err.getvalue())
+
+
+class MainTests(unittest.TestCase):
+    def setUp(self):
+        self.dir = tempfile.TemporaryDirectory()
+        self.addCleanup(self.dir.cleanup)
+        self.root = Path(self.dir.name)
+        self.config = self.root / "config.json"
+        self.config.write_text(json.dumps({**CONFIG, "keep_seasons": 1}))
+
+    def run_main(self, site):
+        with mock.patch.object(bc, "fetch_text", site), redirect_stderr(io.StringIO()) as err, redirect_stdout(io.StringIO()):
+            code = bc.main(["--config", str(self.config)])
+        return code, err.getvalue()
+
+    def test_writes_calendar_cache_and_state(self):
+        site = FakeSite({CURRENT_URL: fixture("team_2026f.html"),
+                         "https://www.ggwsl.org/LibLeague/Direct.php?PARAM_VENUE_CODE=BEA": fixture("venue_BEA.html"),
+                         "https://www.ggwsl.org/LibLeague/Direct.php?PARAM_VENUE_CODE=ALA": "<html></html>"})
+        code, _ = self.run_main(site)
+        self.assertEqual(code, 0)
+        calendar = (self.root / "docs/vikings.ics").read_bytes()
+        self.assertEqual(calendar.count(b"BEGIN:VEVENT"), 10)
+        self.assertIn(b"\r\n", calendar)
+        self.assertTrue((self.root / "seasons/2026f.json").exists())
+        self.assertEqual(len(json.loads((self.root / "state.json").read_text())), 10)
+        self.assertIn("BEA", json.loads((self.root / "venues.json").read_text()))
+
+    def test_broken_page_fails_without_writing(self):
+        code, err = self.run_main(FakeSite({CURRENT_URL: "<html>maintenance</html>"}))
+        self.assertEqual(code, 1)
+        self.assertIn("failed to read the league site", err)
+        self.assertFalse((self.root / "docs").exists())
+        self.assertFalse((self.root / "state.json").exists())
+
+
+if __name__ == "__main__":
+    unittest.main()

@@ -1,0 +1,627 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//vikings-calendar//GGWSL team calendar//EN
+CALSCALE:GREGORIAN
+METHOD:PUBLISH
+X-WR-CALNAME:Vintage Vikings Soccer
+X-WR-TIMEZONE:America/Los_Angeles
+REFRESH-INTERVAL;VALUE=DURATION:PT12H
+X-PUBLISHED-TTL:PT12H
+BEGIN:VEVENT
+UID:ggwsl-2025s-G0_KIL_VVI@vikings-calendar
+DTSTAMP:20260927T192827Z
+LAST-MODIFIED:20260927T192827Z
+SEQUENCE:0
+DTSTART:20250302T210000Z
+DTEND:20250302T223000Z
+SUMMARY:Killer Tomatoes 1 - 2 Vintage Vikings (W)
+DESCRIPTION:Final: Killer Tomatoes 1 - 2 Vintage Vikings (W)\nBeach #1 (Tur
+ f)\n\nUpdated Sep 27\, 2026 12:28 PM PDT
+LOCATION:Beach Chalet\, 1500 John F Kennedy\, Golden Gate Park\, San Franci
+ sco\, CA
+STATUS:CONFIRMED
+TRANSP:OPAQUE
+END:VEVENT
+BEGIN:VEVENT
+UID:ggwsl-2025s-G0_VVI_FRU@vikings-calendar
+DTSTAMP:20260927T192827Z
+LAST-MODIFIED:20260927T192827Z
+SEQUENCE:0
+DTSTART:20250309T200000Z
+DTEND:20250309T213000Z
+SUMMARY:Vintage Vikings 2 - 2 Friends United (D)
+DESCRIPTION:Final: Vintage Vikings 2 - 2 Friends United (D)\nBeach #2 (Turf
+ )\n\nUpdated Sep 27\, 2026 12:28 PM PDT
+LOCATION:Beach Chalet\, 1500 John F Kennedy\, Golden Gate Park\, San Franci
+ sco\, CA
+STATUS:CONFIRMED
+TRANSP:OPAQUE
+END:VEVENT
+BEGIN:VEVENT
+UID:ggwsl-2025s-G0_WAS_VVI@vikings-calendar
+DTSTAMP:20260927T192827Z
+LAST-MODIFIED:20260927T192827Z
+SEQUENCE:0
+DTSTART:20250316T200000Z
+DTEND:20250316T213000Z
+SUMMARY:Wasabi 1 - 2 Vintage Vikings (W)
+DESCRIPTION:Final: Wasabi 1 - 2 Vintage Vikings (W)\nBeach #2 (Turf)\n\nUpd
+ ated Sep 27\, 2026 12:28 PM PDT
+LOCATION:Beach Chalet\, 1500 John F Kennedy\, Golden Gate Park\, San Franci
+ sco\, CA
+STATUS:CONFIRMED
+TRANSP:OPAQUE
+END:VEVENT
+BEGIN:VEVENT
+UID:ggwsl-2025s-G0_FRU_VVI@vikings-calendar
+DTSTAMP:20260927T192827Z
+LAST-MODIFIED:20260927T192827Z
+SEQUENCE:0
+DTSTART:20250323T200000Z
+DTEND:20250323T213000Z
+SUMMARY:Friends United 3 - 1 Vintage Vikings (L)
+DESCRIPTION:Final: Friends United 3 - 1 Vintage Vikings (L)\nBeach #2 (Turf
+ )\n\nUpdated Sep 27\, 2026 12:28 PM PDT
+LOCATION:Beach Chalet\, 1500 John F Kennedy\, Golden Gate Park\, San Franci
+ sco\, CA
+STATUS:CONFIRMED
+TRANSP:OPAQUE
+END:VEVENT
+BEGIN:VEVENT
+UID:ggwsl-2025s-G0_VVI_SPI@vikings-calendar
+DTSTAMP:20260927T192827Z
+LAST-MODIFIED:20260927T192827Z
+SEQUENCE:0
+DTSTART:20250330T180000Z
+DTEND:20250330T193000Z
+SUMMARY:Vintage Vikings 2 - 0 Spitfires (W)
+DESCRIPTION:Final: Vintage Vikings 2 - 0 Spitfires (W)\nBeach #2 (Turf)\n\n
+ Updated Sep 27\, 2026 12:28 PM PDT
+LOCATION:Beach Chalet\, 1500 John F Kennedy\, Golden Gate Park\, San Franci
+ sco\, CA
+STATUS:CONFIRMED
+TRANSP:OPAQUE
+END:VEVENT
+BEGIN:VEVENT
+UID:ggwsl-2025s-G1_WAS_VVI@vikings-calendar
+DTSTAMP:20260927T192827Z
+LAST-MODIFIED:20260927T192827Z
+SEQUENCE:0
+DTSTART:20250413T220000Z
+DTEND:20250413T233000Z
+SUMMARY:Wasabi 3 - 5 Vintage Vikings (W)
+DESCRIPTION:Final: Wasabi 3 - 5 Vintage Vikings (W)\nBeach #2 (Turf)\n\nUpd
+ ated Sep 27\, 2026 12:28 PM PDT
+LOCATION:Beach Chalet\, 1500 John F Kennedy\, Golden Gate Park\, San Franci
+ sco\, CA
+STATUS:CONFIRMED
+TRANSP:OPAQUE
+END:VEVENT
+BEGIN:VEVENT
+UID:ggwsl-2025s-G0_VVI_HFL@vikings-calendar
+DTSTAMP:20260927T192827Z
+LAST-MODIFIED:20260927T192827Z
+SEQUENCE:0
+DTSTART:20250427T200000Z
+DTEND:20250427T213000Z
+SUMMARY:Vintage Vikings 4 - 2 Hot Flashes (W)
+DESCRIPTION:Final: Vintage Vikings 4 - 2 Hot Flashes (W)\nBeach #2 (Turf)\n
+ \nUpdated Sep 27\, 2026 12:28 PM PDT
+LOCATION:Beach Chalet\, 1500 John F Kennedy\, Golden Gate Park\, San Franci
+ sco\, CA
+STATUS:CONFIRMED
+TRANSP:OPAQUE
+END:VEVENT
+BEGIN:VEVENT
+UID:ggwsl-2025s-G0_SPI_VVI@vikings-calendar
+DTSTAMP:20260927T192827Z
+LAST-MODIFIED:20260927T192827Z
+SEQUENCE:0
+DTSTART:20250504T180000Z
+DTEND:20250504T193000Z
+SUMMARY:Spitfires 0 - 6 Vintage Vikings (W)
+DESCRIPTION:Final: Spitfires 0 - 6 Vintage Vikings (W)\nBeach #2 (Turf)\n\n
+ Updated Sep 27\, 2026 12:28 PM PDT
+LOCATION:Beach Chalet\, 1500 John F Kennedy\, Golden Gate Park\, San Franci
+ sco\, CA
+STATUS:CONFIRMED
+TRANSP:OPAQUE
+END:VEVENT
+BEGIN:VEVENT
+UID:ggwsl-2025s-G0_VVI_KIL@vikings-calendar
+DTSTAMP:20260927T192827Z
+LAST-MODIFIED:20260927T192827Z
+SEQUENCE:0
+DTSTART:20250511T180000Z
+DTEND:20250511T193000Z
+SUMMARY:Vintage Vikings 3 - 4 Killer Tomatoes (L)
+DESCRIPTION:Final: Vintage Vikings 3 - 4 Killer Tomatoes (L)\nBeach #2 (Tur
+ f)\n\nUpdated Sep 27\, 2026 12:28 PM PDT
+LOCATION:Beach Chalet\, 1500 John F Kennedy\, Golden Gate Park\, San Franci
+ sco\, CA
+STATUS:CONFIRMED
+TRANSP:OPAQUE
+END:VEVENT
+BEGIN:VEVENT
+UID:ggwsl-2025s-G0_VVI_OFL@vikings-calendar
+DTSTAMP:20260927T192827Z
+LAST-MODIFIED:20260927T192827Z
+SEQUENCE:0
+DTSTART:20250518T160000Z
+DTEND:20250518T173000Z
+SUMMARY:Vintage Vikings 6 - 0 Old Flames (W)
+DESCRIPTION:Final: Vintage Vikings 6 - 0 Old Flames (W)\nJames Lang Athleti
+ c Fiel\n\nStandings after this game:\n1. Friends United 7-1-2\, 23 pts\, G
+ D +19\n2. Killer Tomatoes 7-3-1\, 22 pts\, GD +15\n3. Vintage Vikings 7-2-
+ 1\, 22 pts\, GD +15\n4. Wasabi 6-4\, 18 pts\, GD +10\n5. Old Flames 0-8-2\
+ , 2 pts\, GD -28\n6. Spitfires 0-8-1\, 0 pts\, GD -29\nOther groups:\n- Ho
+ t Flashes 5-2-1\, 12 pts\, GD +9\n\nUpdated Sep 27\, 2026 12:28 PM PDT
+LOCATION:James Lang Fields\, 901 Turk St\, San Francisco\, CA\, 94102
+STATUS:CONFIRMED
+TRANSP:OPAQUE
+END:VEVENT
+BEGIN:VEVENT
+UID:ggwsl-2025f-G0_KIL_VVI@vikings-calendar
+DTSTAMP:20260927T192827Z
+LAST-MODIFIED:20260927T192827Z
+SEQUENCE:0
+DTSTART:20250907T180000Z
+DTEND:20250907T193000Z
+SUMMARY:Killer Tomatoes 1 - 1 Vintage Vikings (D)
+DESCRIPTION:Final: Killer Tomatoes 1 - 1 Vintage Vikings (D)\nTB West (Gras
+ s)\n\nUpdated Sep 27\, 2026 12:28 PM PDT
+LOCATION:Tom Bates (Gilman)\, 400 Gilman Street\, Berkeley\, CA
+STATUS:CONFIRMED
+TRANSP:OPAQUE
+END:VEVENT
+BEGIN:VEVENT
+UID:ggwsl-2025f-G0_VVI_FRU@vikings-calendar
+DTSTAMP:20260927T192827Z
+LAST-MODIFIED:20260927T192827Z
+SEQUENCE:0
+DTSTART:20250914T160000Z
+DTEND:20250914T173000Z
+SUMMARY:Vintage Vikings 1 - 5 Friends United (L)
+DESCRIPTION:Final: Vintage Vikings 1 - 5 Friends United (L)\nBeach #4 (Turf
+ )\n\nUpdated Sep 27\, 2026 12:28 PM PDT
+LOCATION:Beach Chalet\, 1500 John F Kennedy\, Golden Gate Park\, San Franci
+ sco\, CA
+STATUS:CONFIRMED
+TRANSP:OPAQUE
+END:VEVENT
+BEGIN:VEVENT
+UID:ggwsl-2025f-G0_VVI_WAS@vikings-calendar
+DTSTAMP:20260927T192827Z
+LAST-MODIFIED:20260927T192827Z
+SEQUENCE:0
+DTSTART:20250921T180000Z
+DTEND:20250921T193000Z
+SUMMARY:Vintage Vikings 2 - 0 Wasabi (W)
+DESCRIPTION:Final: Vintage Vikings 2 - 0 Wasabi (W)\nBeach #4 (Turf)\n\nUpd
+ ated Sep 27\, 2026 12:28 PM PDT
+LOCATION:Beach Chalet\, 1500 John F Kennedy\, Golden Gate Park\, San Franci
+ sco\, CA
+STATUS:CONFIRMED
+TRANSP:OPAQUE
+END:VEVENT
+BEGIN:VEVENT
+UID:ggwsl-2025f-G0_VVI_KIL@vikings-calendar
+DTSTAMP:20260927T192827Z
+LAST-MODIFIED:20260927T192827Z
+SEQUENCE:0
+DTSTART:20250928T160000Z
+DTEND:20250928T173000Z
+SUMMARY:Vintage Vikings 0 - 1 Killer Tomatoes (L)
+DESCRIPTION:Final: Vintage Vikings 0 - 1 Killer Tomatoes (L)\nBeach #4 (Tur
+ f)\n\nUpdated Sep 27\, 2026 12:28 PM PDT
+LOCATION:Beach Chalet\, 1500 John F Kennedy\, Golden Gate Park\, San Franci
+ sco\, CA
+STATUS:CONFIRMED
+TRANSP:OPAQUE
+END:VEVENT
+BEGIN:VEVENT
+UID:ggwsl-2025f-G0_OFL_VVI@vikings-calendar
+DTSTAMP:20260927T192827Z
+LAST-MODIFIED:20260927T192827Z
+SEQUENCE:0
+DTSTART:20251005T180000Z
+DTEND:20251005T193000Z
+SUMMARY:Old Flames 1 - 2 Vintage Vikings (W)
+DESCRIPTION:Final: Old Flames 1 - 2 Vintage Vikings (W)\nBeach #4 (Turf)\n\
+ nUpdated Sep 27\, 2026 12:28 PM PDT
+LOCATION:Beach Chalet\, 1500 John F Kennedy\, Golden Gate Park\, San Franci
+ sco\, CA
+STATUS:CONFIRMED
+TRANSP:OPAQUE
+END:VEVENT
+BEGIN:VEVENT
+UID:ggwsl-2025f-G0_VVI_MAV@vikings-calendar
+DTSTAMP:20260927T192827Z
+LAST-MODIFIED:20260927T192827Z
+SEQUENCE:0
+DTSTART:20251019T160000Z
+DTEND:20251019T173000Z
+SUMMARY:Vintage Vikings 8 - 0 Mavens (W)
+DESCRIPTION:Final: Vintage Vikings 8 - 0 Mavens (W)\nBeach #4 (Turf)\n\nUpd
+ ated Sep 27\, 2026 12:28 PM PDT
+LOCATION:Beach Chalet\, 1500 John F Kennedy\, Golden Gate Park\, San Franci
+ sco\, CA
+STATUS:CONFIRMED
+TRANSP:OPAQUE
+END:VEVENT
+BEGIN:VEVENT
+UID:ggwsl-2025f-G0_SPI_VVI@vikings-calendar
+DTSTAMP:20260927T192827Z
+LAST-MODIFIED:20260927T192827Z
+SEQUENCE:0
+DTSTART:20251026T180000Z
+DTEND:20251026T193000Z
+SUMMARY:Spitfires 3 - 0 Vintage Vikings (L)
+DESCRIPTION:Final: Spitfires 3 - 0 Vintage Vikings (L)\nBeach #4 (Turf)\n\n
+ Updated Sep 27\, 2026 12:28 PM PDT
+LOCATION:Beach Chalet\, 1500 John F Kennedy\, Golden Gate Park\, San Franci
+ sco\, CA
+STATUS:CONFIRMED
+TRANSP:OPAQUE
+END:VEVENT
+BEGIN:VEVENT
+UID:ggwsl-2025f-G0_VVI_HFL@vikings-calendar
+DTSTAMP:20260927T192827Z
+LAST-MODIFIED:20260927T192827Z
+SEQUENCE:0
+DTSTART:20251102T210000Z
+DTEND:20251102T223000Z
+SUMMARY:Vintage Vikings 5 - 0 Hot Flashes (W)
+DESCRIPTION:Final: Vintage Vikings 5 - 0 Hot Flashes (W)\nBeach #4 (Turf)\n
+ \nUpdated Sep 27\, 2026 12:28 PM PDT
+LOCATION:Beach Chalet\, 1500 John F Kennedy\, Golden Gate Park\, San Franci
+ sco\, CA
+STATUS:CONFIRMED
+TRANSP:OPAQUE
+END:VEVENT
+BEGIN:VEVENT
+UID:ggwsl-2025f-G0_FRU_VVI@vikings-calendar
+DTSTAMP:20260927T192827Z
+LAST-MODIFIED:20260927T192827Z
+SEQUENCE:0
+DTSTART:20251116T230000Z
+DTEND:20251117T003000Z
+SUMMARY:Friends United 1 - 1 Vintage Vikings (D)
+DESCRIPTION:Final: Friends United 1 - 1 Vintage Vikings (D)\nBeach #4 (Turf
+ )\n\nUpdated Sep 27\, 2026 12:28 PM PDT
+LOCATION:Beach Chalet\, 1500 John F Kennedy\, Golden Gate Park\, San Franci
+ sco\, CA
+STATUS:CONFIRMED
+TRANSP:OPAQUE
+END:VEVENT
+BEGIN:VEVENT
+UID:ggwsl-2025f-G0_WAS_VVI@vikings-calendar
+DTSTAMP:20260927T192827Z
+LAST-MODIFIED:20260927T192827Z
+SEQUENCE:0
+DTSTART:20251123T170000Z
+DTEND:20251123T183000Z
+SUMMARY:Wasabi 3 - 6 Vintage Vikings (W)
+DESCRIPTION:Final: Wasabi 3 - 6 Vintage Vikings (W)\nBeach #4 (Turf)\n\nSta
+ ndings after this game:\n1. Friends United 8-0-2\, 26 pts\, GD +31\n2. Kil
+ ler Tomatoes 5-2-3\, 18 pts\, GD +7\n3. Vintage Vikings 5-3-2\, 17 pts\, G
+ D +8\n4. Wasabi 5-5\, 15 pts\, GD +4\n5. Old Flames 3-6\, 8 pts\, GD -15\n
+ 6. Hot Flashes 2-5-2\, 7 pts\, GD -11\nOther groups:\n- Spitfires 7-2-1\, 
+ 22 pts\, GD +21\n- Mavens 5-5\, 15 pts\, GD -18\n\nUpdated Sep 27\, 2026 1
+ 2:28 PM PDT
+LOCATION:Beach Chalet\, 1500 John F Kennedy\, Golden Gate Park\, San Franci
+ sco\, CA
+STATUS:CONFIRMED
+TRANSP:OPAQUE
+END:VEVENT
+BEGIN:VEVENT
+UID:ggwsl-2026s-G0_WAS_VVI@vikings-calendar
+DTSTAMP:20260927T192827Z
+LAST-MODIFIED:20260927T192827Z
+SEQUENCE:0
+DTSTART:20260308T220000Z
+DTEND:20260308T233000Z
+SUMMARY:Wasabi 1 - 0 Vintage Vikings (L)
+DESCRIPTION:Final: Wasabi 1 - 0 Vintage Vikings (L)\nBeach #2 (Turf)\n\nUpd
+ ated Sep 27\, 2026 12:28 PM PDT
+LOCATION:Beach Chalet\, 1500 John F Kennedy\, Golden Gate Park\, San Franci
+ sco\, CA
+STATUS:CONFIRMED
+TRANSP:OPAQUE
+END:VEVENT
+BEGIN:VEVENT
+UID:ggwsl-2026s-G0_VVI_HFL@vikings-calendar
+DTSTAMP:20260927T192827Z
+LAST-MODIFIED:20260927T192827Z
+SEQUENCE:0
+DTSTART:20260315T180000Z
+DTEND:20260315T193000Z
+SUMMARY:Vintage Vikings 5 - 0 Hot Flashes (W)
+DESCRIPTION:Final: Vintage Vikings 5 - 0 Hot Flashes (W)\nBeach #2 (Turf)\n
+ \nUpdated Sep 27\, 2026 12:28 PM PDT
+LOCATION:Beach Chalet\, 1500 John F Kennedy\, Golden Gate Park\, San Franci
+ sco\, CA
+STATUS:CONFIRMED
+TRANSP:OPAQUE
+END:VEVENT
+BEGIN:VEVENT
+UID:ggwsl-2026s-G0_VVI_FRU@vikings-calendar
+DTSTAMP:20260927T192827Z
+LAST-MODIFIED:20260927T192827Z
+SEQUENCE:0
+DTSTART:20260322T160000Z
+DTEND:20260322T173000Z
+SUMMARY:Vintage Vikings 1 - 1 Friends United (D)
+DESCRIPTION:Final: Vintage Vikings 1 - 1 Friends United (D)\nBeach #2 (Turf
+ )\n\nUpdated Sep 27\, 2026 12:28 PM PDT
+LOCATION:Beach Chalet\, 1500 John F Kennedy\, Golden Gate Park\, San Franci
+ sco\, CA
+STATUS:CONFIRMED
+TRANSP:OPAQUE
+END:VEVENT
+BEGIN:VEVENT
+UID:ggwsl-2026s-G0_VVI_KIL@vikings-calendar
+DTSTAMP:20260927T192827Z
+LAST-MODIFIED:20260927T192827Z
+SEQUENCE:0
+DTSTART:20260329T160000Z
+DTEND:20260329T173000Z
+SUMMARY:Vintage Vikings 4 - 3 Killer Tomatoes (W)
+DESCRIPTION:Final: Vintage Vikings 4 - 3 Killer Tomatoes (W)\nBeach #2 (Tur
+ f)\n\nUpdated Sep 27\, 2026 12:28 PM PDT
+LOCATION:Beach Chalet\, 1500 John F Kennedy\, Golden Gate Park\, San Franci
+ sco\, CA
+STATUS:CONFIRMED
+TRANSP:OPAQUE
+END:VEVENT
+BEGIN:VEVENT
+UID:ggwsl-2026s-G1_VVI_WAS@vikings-calendar
+DTSTAMP:20260927T192827Z
+LAST-MODIFIED:20260927T192827Z
+SEQUENCE:0
+DTSTART:20260419T200000Z
+DTEND:20260419T213000Z
+SUMMARY:Vintage Vikings 2 - 2 Wasabi (D)
+DESCRIPTION:Final: Vintage Vikings 2 - 2 Wasabi (D)\nBeach #2 (Turf)\n\nUpd
+ ated Sep 27\, 2026 12:28 PM PDT
+LOCATION:Beach Chalet\, 1500 John F Kennedy\, Golden Gate Park\, San Franci
+ sco\, CA
+STATUS:CONFIRMED
+TRANSP:OPAQUE
+END:VEVENT
+BEGIN:VEVENT
+UID:ggwsl-2026s-G0_SPI_VVI@vikings-calendar
+DTSTAMP:20260927T192827Z
+LAST-MODIFIED:20260927T192827Z
+SEQUENCE:0
+DTSTART:20260426T180000Z
+DTEND:20260426T193000Z
+SUMMARY:Spitfires 1 - 2 Vintage Vikings (W)
+DESCRIPTION:Final: Spitfires 1 - 2 Vintage Vikings (W)\nBeach #2 (Turf)\n\n
+ Updated Sep 27\, 2026 12:28 PM PDT
+LOCATION:Beach Chalet\, 1500 John F Kennedy\, Golden Gate Park\, San Franci
+ sco\, CA
+STATUS:CONFIRMED
+TRANSP:OPAQUE
+END:VEVENT
+BEGIN:VEVENT
+UID:ggwsl-2026s-G0_FRU_VVI@vikings-calendar
+DTSTAMP:20260927T192827Z
+LAST-MODIFIED:20260927T192827Z
+SEQUENCE:0
+DTSTART:20260503T160000Z
+DTEND:20260503T173000Z
+SUMMARY:Friends United 0 - 1 Vintage Vikings (W)
+DESCRIPTION:Final: Friends United 0 - 1 Vintage Vikings (W)\nBeach #2 (Turf
+ )\n\nUpdated Sep 27\, 2026 12:28 PM PDT
+LOCATION:Beach Chalet\, 1500 John F Kennedy\, Golden Gate Park\, San Franci
+ sco\, CA
+STATUS:CONFIRMED
+TRANSP:OPAQUE
+END:VEVENT
+BEGIN:VEVENT
+UID:ggwsl-2026s-G0_OFL_VVI@vikings-calendar
+DTSTAMP:20260927T192827Z
+LAST-MODIFIED:20260927T192827Z
+SEQUENCE:0
+DTSTART:20260516T220000Z
+DTEND:20260516T233000Z
+SUMMARY:Old Flames 0 - 3 Vintage Vikings (W)
+DESCRIPTION:Final: Old Flames 0 - 3 Vintage Vikings (W)\nFrkln. Sq. (Turf)\
+ n\nUpdated Sep 27\, 2026 12:28 PM PDT
+LOCATION:Franklin Square\, 16th & Bryant\, San Francisco\, CA
+STATUS:CONFIRMED
+TRANSP:OPAQUE
+END:VEVENT
+BEGIN:VEVENT
+UID:ggwsl-2026s-G1_VVI_KIL@vikings-calendar
+DTSTAMP:20260927T192827Z
+LAST-MODIFIED:20260927T192827Z
+SEQUENCE:0
+DTSTART:20260531T200000Z
+DTEND:20260531T213000Z
+SUMMARY:Vintage Vikings 2 - 0 Killer Tomatoes (W)
+DESCRIPTION:Final: Vintage Vikings 2 - 0 Killer Tomatoes (W)\nCrckr Amzn #4
+ \n\nUpdated Sep 27\, 2026 12:28 PM PDT
+LOCATION:Crocker Amazon Playground\, Geneva Ave\, San Francisco\, CA
+STATUS:CONFIRMED
+TRANSP:OPAQUE
+END:VEVENT
+BEGIN:VEVENT
+UID:ggwsl-2026s-G1_SPI_VVI@vikings-calendar
+DTSTAMP:20260927T192827Z
+LAST-MODIFIED:20260927T192827Z
+SEQUENCE:0
+DTSTART:20260607T200000Z
+DTEND:20260607T213000Z
+SUMMARY:Spitfires 0 - 5 Vintage Vikings (W)
+DESCRIPTION:Final: Spitfires 0 - 5 Vintage Vikings (W)\nCrckr Amzn #4\n\nSt
+ andings after this game:\n1. Vintage Vikings 7-1-2\, 23 pts\, GD +17\n2. F
+ riends United 6-3-1\, 19 pts\, GD +12\n3. Killer Tomatoes 6-3-1\, 19 pts\,
+  GD +12\n4. Wasabi 6-4-1\, 19 pts\, GD +1\n5. Spitfires 3-5-2\, 11 pts\, G
+ D -5\n6. Old Flames 0-9-1\, 1 pts\, GD -32\nOther groups:\n- Hot Flashes 5
+ -3\, 11 pts\, GD +6\n\nUpdated Sep 27\, 2026 12:28 PM PDT
+LOCATION:Crocker Amazon Playground\, Geneva Ave\, San Francisco\, CA
+STATUS:CONFIRMED
+TRANSP:OPAQUE
+END:VEVENT
+BEGIN:VEVENT
+UID:ggwsl-2026f-G0_WAS_VVI@vikings-calendar
+DTSTAMP:20260927T192827Z
+LAST-MODIFIED:20260927T192827Z
+SEQUENCE:0
+DTSTART:20260913T200000Z
+DTEND:20260913T213000Z
+SUMMARY:Wasabi 3 - 2 Vintage Vikings (L)
+DESCRIPTION:Final: Wasabi 3 - 2 Vintage Vikings (L)\nBeach #4 (Turf)\n\nUpd
+ ated Sep 27\, 2026 12:28 PM PDT
+LOCATION:Beach Chalet\, 1500 John F Kennedy\, Golden Gate Park\, San Franci
+ sco\, CA
+STATUS:CONFIRMED
+TRANSP:OPAQUE
+END:VEVENT
+BEGIN:VEVENT
+UID:ggwsl-2026f-G0_VVI_FRU@vikings-calendar
+DTSTAMP:20260927T192827Z
+LAST-MODIFIED:20260927T192827Z
+SEQUENCE:0
+DTSTART:20260920T180000Z
+DTEND:20260920T193000Z
+SUMMARY:Vintage Vikings 0 - 0 Friends United (D)
+DESCRIPTION:Final: Vintage Vikings 0 - 0 Friends United (D)\nBeach #4 (Turf
+ )\n\nUpdated Sep 27\, 2026 12:28 PM PDT
+LOCATION:Beach Chalet\, 1500 John F Kennedy\, Golden Gate Park\, San Franci
+ sco\, CA
+STATUS:CONFIRMED
+TRANSP:OPAQUE
+END:VEVENT
+BEGIN:VEVENT
+UID:ggwsl-2026f-G0_KIL_VVI@vikings-calendar
+DTSTAMP:20260927T192827Z
+LAST-MODIFIED:20260927T192827Z
+SEQUENCE:0
+DTSTART:20260927T220000Z
+DTEND:20260927T233000Z
+SUMMARY:Killer Tomatoes (1st\, 2-0) vs Vintage Vikings (4th\, 0-1-1)
+DESCRIPTION:Killer Tomatoes (home) vs Vintage Vikings (away)\nAlameda Estua
+ ry Park\n\nStandings:\n1. Killer Tomatoes 2-0\, 6 pts\, GD +10\n2. Wasabi 
+ 2-0\, 6 pts\, GD +4\n3. Friends United 1-0-1\, 4 pts\, GD +2\n4. Vintage V
+ ikings 0-1-1\, 1 pts\, GD -1\n5. Spitfires 0-1\, 0 pts\, GD -2\n6. Old Fla
+ mes 0-2\, 0 pts\, GD -8\n\nUpdated Sep 27\, 2026 12:28 PM PDT
+LOCATION:Alameda Estuary Park\, 230-200 Mosley Ave\, Alameda\, CA\, 94501
+STATUS:CONFIRMED
+TRANSP:OPAQUE
+END:VEVENT
+BEGIN:VEVENT
+UID:ggwsl-2026f-G0_SPI_VVI@vikings-calendar
+DTSTAMP:20260927T192827Z
+LAST-MODIFIED:20260927T192827Z
+SEQUENCE:0
+DTSTART:20261004T220000Z
+DTEND:20261004T233000Z
+SUMMARY:Spitfires vs Vintage Vikings
+DESCRIPTION:Spitfires (home) vs Vintage Vikings (away)\nBeach #4 (Turf)\n\n
+ Standings and records are added the week of the game.\n\nUpdated Sep 27\, 
+ 2026 12:28 PM PDT
+LOCATION:Beach Chalet\, 1500 John F Kennedy\, Golden Gate Park\, San Franci
+ sco\, CA
+STATUS:CONFIRMED
+TRANSP:OPAQUE
+END:VEVENT
+BEGIN:VEVENT
+UID:ggwsl-2026f-G1_OFL_VVI@vikings-calendar
+DTSTAMP:20260927T192827Z
+LAST-MODIFIED:20260927T192827Z
+SEQUENCE:0
+DTSTART:20261018T160000Z
+DTEND:20261018T173000Z
+SUMMARY:Old Flames vs Vintage Vikings
+DESCRIPTION:Old Flames (home) vs Vintage Vikings (away)\nBeach #4 (Turf)\n\
+ nStandings and records are added the week of the game.\n\nUpdated Sep 27\,
+  2026 12:28 PM PDT
+LOCATION:Beach Chalet\, 1500 John F Kennedy\, Golden Gate Park\, San Franci
+ sco\, CA
+STATUS:CONFIRMED
+TRANSP:OPAQUE
+END:VEVENT
+BEGIN:VEVENT
+UID:ggwsl-2026f-G0_VVI_WAS@vikings-calendar
+DTSTAMP:20260927T192827Z
+LAST-MODIFIED:20260927T192827Z
+SEQUENCE:0
+DTSTART:20261025T220000Z
+DTEND:20261025T233000Z
+SUMMARY:Vintage Vikings vs Wasabi
+DESCRIPTION:Vintage Vikings (home) vs Wasabi (away)\nBeach #4 (Turf)\n\nSta
+ ndings and records are added the week of the game.\n\nUpdated Sep 27\, 202
+ 6 12:28 PM PDT
+LOCATION:Beach Chalet\, 1500 John F Kennedy\, Golden Gate Park\, San Franci
+ sco\, CA
+STATUS:CONFIRMED
+TRANSP:OPAQUE
+END:VEVENT
+BEGIN:VEVENT
+UID:ggwsl-2026f-G0_VVI_KIL@vikings-calendar
+DTSTAMP:20260927T192827Z
+LAST-MODIFIED:20260927T192827Z
+SEQUENCE:0
+DTSTART:20261101T170000Z
+DTEND:20261101T183000Z
+SUMMARY:Vintage Vikings vs Killer Tomatoes
+DESCRIPTION:Vintage Vikings (home) vs Killer Tomatoes (away)\nBeach #4 (Tur
+ f)\n\nStandings and records are added the week of the game.\n\nUpdated Sep
+  27\, 2026 12:28 PM PDT
+LOCATION:Beach Chalet\, 1500 John F Kennedy\, Golden Gate Park\, San Franci
+ sco\, CA
+STATUS:CONFIRMED
+TRANSP:OPAQUE
+END:VEVENT
+BEGIN:VEVENT
+UID:ggwsl-2026f-G0_OFL_VVI@vikings-calendar
+DTSTAMP:20260927T192827Z
+LAST-MODIFIED:20260927T192827Z
+SEQUENCE:0
+DTSTART:20261108T210000Z
+DTEND:20261108T223000Z
+SUMMARY:Old Flames vs Vintage Vikings
+DESCRIPTION:Old Flames (home) vs Vintage Vikings (away)\nBeach #4 (Turf)\n\
+ nStandings and records are added the week of the game.\n\nUpdated Sep 27\,
+  2026 12:28 PM PDT
+LOCATION:Beach Chalet\, 1500 John F Kennedy\, Golden Gate Park\, San Franci
+ sco\, CA
+STATUS:CONFIRMED
+TRANSP:OPAQUE
+END:VEVENT
+BEGIN:VEVENT
+UID:ggwsl-2026f-G1_VVI_FRU@vikings-calendar
+DTSTAMP:20260927T192827Z
+LAST-MODIFIED:20260927T192827Z
+SEQUENCE:0
+DTSTART:20261115T190000Z
+DTEND:20261115T203000Z
+SUMMARY:Vintage Vikings vs Friends United
+DESCRIPTION:Vintage Vikings (home) vs Friends United (away)\nBeach #4 (Turf
+ )\n\nStandings and records are added the week of the game.\n\nUpdated Sep 
+ 27\, 2026 12:28 PM PDT
+LOCATION:Beach Chalet\, 1500 John F Kennedy\, Golden Gate Park\, San Franci
+ sco\, CA
+STATUS:CONFIRMED
+TRANSP:OPAQUE
+END:VEVENT
+BEGIN:VEVENT
+UID:ggwsl-2026f-G1_VVI_SPI@vikings-calendar
+DTSTAMP:20260927T192827Z
+LAST-MODIFIED:20260927T192827Z
+SEQUENCE:0
+DTSTART:20261122T230000Z
+DTEND:20261123T003000Z
+SUMMARY:Vintage Vikings vs Spitfires
+DESCRIPTION:Vintage Vikings (home) vs Spitfires (away)\nBeach #4 (Turf)\n\n
+ Standings and records are added the week of the game.\n\nUpdated Sep 27\, 
+ 2026 12:28 PM PDT
+LOCATION:Beach Chalet\, 1500 John F Kennedy\, Golden Gate Park\, San Franci
+ sco\, CA
+STATUS:CONFIRMED
+TRANSP:OPAQUE
+END:VEVENT
+END:VCALENDAR

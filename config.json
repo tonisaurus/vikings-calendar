@@ -1,0 +1,13 @@
+{
+  "team": "Vintage Vikings",
+  "team_code": "VVI",
+  "calendar_name": "Vintage Vikings Soccer",
+  "timezone": "America/Los_Angeles",
+  "site": "https://www.ggwsl.org",
+  "game_minutes": 90,
+  "keep_seasons": 4,
+  "output": "docs/vikings.ics",
+  "state_file": "state.json",
+  "venues_file": "venues.json",
+  "cache_dir": "seasons"
+}
