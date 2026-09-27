@@ -27,7 +27,7 @@ import sys
 import time
 import urllib.error
 import urllib.request
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
 from datetime import date, datetime, timedelta, timezone
 from html.parser import HTMLParser
 from pathlib import Path
@@ -95,6 +95,7 @@ class Game:
     competition: str = LEAGUE
     status: str = SCHEDULED
     all_day: bool = False  # no kickoff time on the page yet
+    home_unclear: bool = False  # the page's bold (home) marking disagrees with the game code; shown as our home game
 
     @property
     def has_result(self) -> bool:
@@ -113,7 +114,7 @@ class Game:
 class Standing:
     code: str
     name: str
-    rank: int | None  # position within our group; None for a team in another group of the division
+    rank: int
     played: int
     wins: int
     losses: int
@@ -341,10 +342,12 @@ def parse_schedule(rows: list[list[Cell]], team_code: str, season: str, tz: Zone
             raise PageError(f"schedule row without a game code or opponent link: {values}")
         if {teams.group(1), teams.group(2)} != {team_code, opponent_code}:
             raise PageError(f"game code {game_code} does not match {team_code} vs {opponent_code}")
-        # Home games are printed in bold; the game code lists the home team first. Both must agree.
+        # Home games are printed in bold, and the game code lists the home team first. They have always
+        # agreed; if they ever do not, list the game as ours and say so in the event.
         home = teams.group(1) == team_code
-        if len({c.bold for c in row}) != 1 or row[0].bold != home:
-            raise PageError(f"bold (home game) marking disagrees with game code {game_code}")
+        home_unclear = len({c.bold for c in row}) != 1 or row[0].bold != home
+        if home_unclear:
+            home = True
         kickoff_time = parse_time(kickoff)
         hour, minute = kickoff_time or (0, 0)
         ours, theirs = parse_score(score)
@@ -366,6 +369,7 @@ def parse_schedule(rows: list[list[Cell]], team_code: str, season: str, tz: Zone
             competition=competition.lower() or LEAGUE,
             status=status,
             all_day=kickoff_time is None,
+            home_unclear=home_unclear,
         ))
     if len({g.code for g in games}) != len(games):
         raise PageError("duplicate game codes in the schedule")
@@ -382,9 +386,10 @@ def parse_int(value: str, what: str) -> int:
 def parse_standings(rows: list[list[Cell]], team_code: str, keep: set[str]) -> Standings:
     """The division table, limited to the teams in `keep` (ours and our opponents), in the league's order.
 
-    The league splits a division into groups with spacer rows and ranks each group on its own. Teams
-    in our group are ranked by their position in it; opponents from other groups (a few cross-group
-    games happen) follow, unranked.
+    The league splits a division into groups with spacer rows and ranks each group on its own. Our
+    group keeps the league's order. Opponents listed in another group (the team promoted from the
+    lower group plays both) are slotted in by points, then goal difference, then goals for, after any
+    team they tie with.
     """
     groups: list[list[tuple[str, list[str]]]] = [[]]
     for row in rows:
@@ -397,14 +402,21 @@ def parse_standings(rows: list[list[Cell]], team_code: str, keep: set[str]) -> S
             raise PageError(f"unexpected standings row {values}")
         groups[-1].append((code, values))
 
+    def standing(code: str, values: list[str]) -> Standing:
+        return Standing(code, values[1], 0, *(parse_int(v, h) for v, h in zip(values[2:], STANDINGS_HEADER[2:])))
+
+    def strength(row: Standing) -> tuple[int, int, int]:
+        return row.points, row.goal_diff, row.goals_for
+
     ours = next((g for g in groups if any(code == team_code for code, _ in g)), [])
-    ranked = [(code, values, rank) for rank, (code, values) in enumerate(ours, start=1)]
-    others = [(code, values, None) for g in groups if g is not ours for code, values in g]
-    return Standings([
-        Standing(code, values[1], rank, *(parse_int(v, h) for v, h in zip(values[2:], STANDINGS_HEADER[2:])))
-        for code, values, rank in ranked + others
-        if code in keep
-    ])
+    rows = [standing(code, values) for code, values in ours if code in keep]
+    for group in groups:
+        if group is ours:
+            continue
+        for extra in (standing(code, values) for code, values in group if code in keep):
+            at = next((i for i, row in enumerate(rows) if strength(extra) > strength(row)), len(rows))
+            rows.insert(at, extra)
+    return Standings([replace(row, rank=rank) for rank, row in enumerate(rows, start=1)])
 
 
 def parse_team_page(html: str, team_code: str, tz: ZoneInfo, require_schedule: bool = True) -> TeamPage:
@@ -497,7 +509,7 @@ def game_to_json(game: Game) -> dict:
         "code": game.code, "date": game.start.date().isoformat(), "time": "" if game.all_day else game.start.strftime("%H:%M"),
         "field": game.field, "venue_code": game.venue_code, "opponent": game.opponent,
         "opponent_code": game.opponent_code, "home": game.home, "result": game.result,
-        "our_score": game.our_score, "their_score": game.their_score, "forfeit": game.forfeit,
+        "our_score": game.our_score, "their_score": game.their_score, "forfeit": game.forfeit, "home_unclear": game.home_unclear,
         "competition": game.competition, "status": game.status,
     }
 
@@ -665,7 +677,7 @@ def annotate(name: str, code: str, standings: Standings | None) -> str:
     row = standings.for_team(code) if standings else None
     if row is None:
         return name
-    return f"{name} ({ordinal(row.rank)}, {row.record})" if row.rank else f"{name} ({row.record})"
+    return f"{name} ({ordinal(row.rank)}, {row.record})"
 
 
 def prefix(game: Game) -> str:
@@ -698,14 +710,10 @@ def build_summary(game: Game, team: str, team_code: str, featured: bool, standin
 
 def standings_table(standings: Standings, team: str, team_code: str, heading: str) -> list[str]:
     # Calendar apps render descriptions in proportional fonts, so keep rows compact rather than column-aligned.
-    def line(row: Standing, label: str) -> str:
+    lines = [heading]
+    for row in standings.rows:
         name = team if row.code == team_code else row.name
-        return f"{label} {name} {row.record}, {row.points} pts, GD {row.goal_diff:+d}"
-
-    lines = [heading] + [line(row, f"{row.rank}.") for row in standings.rows if row.rank]
-    others = [line(row, "-") for row in standings.rows if not row.rank]
-    if others:
-        lines += ["Other groups:"] + others
+        lines.append(f"{row.rank}. {name} {row.record}, {row.points} pts, GD {row.goal_diff:+d}")
     return lines
 
 
@@ -720,6 +728,8 @@ def build_description(game: Game, team: str, team_code: str, standings: Standing
         if game.status != SCHEDULED:
             lines.append(f"Status: {game.status_label}")
         lines.append(f"{home} (home) vs {away} (away)")
+    if game.home_unclear:
+        lines.append("Home and away are unclear: the league site lists this game inconsistently.")
     if game.competition != LEAGUE:
         lines.append(f"Competition: {game.competition}")
     if game.field:

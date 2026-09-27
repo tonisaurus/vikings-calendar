@@ -22,8 +22,9 @@ address from the league's venue page, and the description names the field (e.g. 
 are 90 minutes long in the calendar.
 
 Standings are limited to the teams on our schedule. The league splits the Over-35 division into groups and
-ranks each on its own, so opponents from another group (the occasional cross-group game) are listed after
-ours, unranked.
+ranks each on its own. The team promoted from the lower group each season plays teams in both groups but is
+listed in the lower one, so it is slotted into our group's table by points, then goal difference, then goals
+for (after any team it ties with). Our group's own order is kept exactly as the league has it.
 
 ## How it works
 
@@ -32,10 +33,12 @@ ours, unranked.
   Its season selector lists every season the team has played, and each season's page (`+PARAM_SEASON_CODE=2026f`)
   has the schedule, results and division standings. Python 3.9+, no dependencies.
 - The page is read strictly, and a run fails instead of publishing a wrong calendar when something does not
-  add up: a missing table, a row with the wrong number of columns, a home/away marking (bold rows) that
-  disagrees with the game code, a date on a different weekday than the page says, or a kickoff time with no
-  plausible AM/PM reading. Times are printed without AM/PM, so 8-11 are read as morning and 12-7 as
+  add up: a missing table, a row with the wrong number of columns, a date on a different weekday than the
+  page's own day column says (the year is inferred from the season, so this catches a wrong year), or a
+  kickoff hour that is not 1-12. Times are printed without AM/PM, so 8-11 are read as morning and 12-7 as
   afternoon, all Pacific time. Parsing was checked against every season back to 2009.
+- Home games are printed in bold, and the game code lists the home team first. If the two ever disagree
+  (they never have), the game is listed as our home game and its description says home and away are unclear.
 - The league's game code (e.g. `G0_WAS_VVI`: round, home team, away team) is the event `UID`, so a
   rescheduled game or a posted score updates the existing calendar entry instead of creating a new one.
 - The league only publishes the current table. Each run stores it against every game whose result is posted

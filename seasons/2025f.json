@@ -8,6 +8,7 @@
       "field": "TB West (Grass)",
       "forfeit": false,
       "home": false,
+      "home_unclear": false,
       "opponent": "Killer Tomatoes",
       "opponent_code": "KIL",
       "our_score": "1",
@@ -24,6 +25,7 @@
       "field": "Beach #4 (Turf)",
       "forfeit": false,
       "home": true,
+      "home_unclear": false,
       "opponent": "Friends United",
       "opponent_code": "FRU",
       "our_score": "1",
@@ -40,6 +42,7 @@
       "field": "Beach #4 (Turf)",
       "forfeit": false,
       "home": true,
+      "home_unclear": false,
       "opponent": "Wasabi",
       "opponent_code": "WAS",
       "our_score": "2",
@@ -56,6 +59,7 @@
       "field": "Beach #4 (Turf)",
       "forfeit": false,
       "home": true,
+      "home_unclear": false,
       "opponent": "Killer Tomatoes",
       "opponent_code": "KIL",
       "our_score": "0",
@@ -72,6 +76,7 @@
       "field": "Beach #4 (Turf)",
       "forfeit": false,
       "home": false,
+      "home_unclear": false,
       "opponent": "Old Flames",
       "opponent_code": "OFL",
       "our_score": "2",
@@ -88,6 +93,7 @@
       "field": "Beach #4 (Turf)",
       "forfeit": false,
       "home": true,
+      "home_unclear": false,
       "opponent": "Mavens",
       "opponent_code": "MAV",
       "our_score": "8",
@@ -104,6 +110,7 @@
       "field": "Beach #4 (Turf)",
       "forfeit": false,
       "home": false,
+      "home_unclear": false,
       "opponent": "Spitfires",
       "opponent_code": "SPI",
       "our_score": "0",
@@ -120,6 +127,7 @@
       "field": "Beach #4 (Turf)",
       "forfeit": false,
       "home": true,
+      "home_unclear": false,
       "opponent": "Hot Flashes",
       "opponent_code": "HFL",
       "our_score": "5",
@@ -136,6 +144,7 @@
       "field": "Beach #4 (Turf)",
       "forfeit": false,
       "home": false,
+      "home_unclear": false,
       "opponent": "Friends United",
       "opponent_code": "FRU",
       "our_score": "1",
@@ -152,6 +161,7 @@
       "field": "Beach #4 (Turf)",
       "forfeit": false,
       "home": false,
+      "home_unclear": false,
       "opponent": "Wasabi",
       "opponent_code": "WAS",
       "our_score": "6",
@@ -180,6 +190,20 @@
       "wins": 8
     },
     {
+      "code": "SPI",
+      "draws": 1,
+      "forfeits": 0,
+      "goal_diff": 21,
+      "goals_against": 11,
+      "goals_for": 34,
+      "losses": 2,
+      "name": "Spitfires",
+      "played": 10,
+      "points": 22,
+      "rank": 2,
+      "wins": 7
+    },
+    {
       "code": "KIL",
       "draws": 3,
       "forfeits": 0,
@@ -190,7 +214,7 @@
       "name": "Killer Tomatoes",
       "played": 10,
       "points": 18,
-      "rank": 2,
+      "rank": 3,
       "wins": 5
     },
     {
@@ -204,7 +228,7 @@
       "name": "Elliott's Vintage Vikings",
       "played": 10,
       "points": 17,
-      "rank": 3,
+      "rank": 4,
       "wins": 5
     },
     {
@@ -218,7 +242,21 @@
       "name": "Wasabi",
       "played": 10,
       "points": 15,
-      "rank": 4,
+      "rank": 5,
+      "wins": 5
+    },
+    {
+      "code": "MAV",
+      "draws": 0,
+      "forfeits": 0,
+      "goal_diff": -18,
+      "goals_against": 39,
+      "goals_for": 12,
+      "losses": 5,
+      "name": "Mavens",
+      "played": 10,
+      "points": 15,
+      "rank": 6,
       "wins": 5
     },
     {
@@ -232,7 +270,7 @@
       "name": "Old Flames",
       "played": 10,
       "points": 8,
-      "rank": 5,
+      "rank": 7,
       "wins": 3
     },
     {
@@ -246,36 +284,8 @@
       "name": "Hot Flashes",
       "played": 10,
       "points": 7,
-      "rank": 6,
+      "rank": 8,
       "wins": 2
-    },
-    {
-      "code": "SPI",
-      "draws": 1,
-      "forfeits": 0,
-      "goal_diff": 21,
-      "goals_against": 11,
-      "goals_for": 34,
-      "losses": 2,
-      "name": "Spitfires",
-      "played": 10,
-      "points": 22,
-      "rank": null,
-      "wins": 7
-    },
-    {
-      "code": "MAV",
-      "draws": 0,
-      "forfeits": 0,
-      "goal_diff": -18,
-      "goals_against": 39,
-      "goals_for": 12,
-      "losses": 5,
-      "name": "Mavens",
-      "played": 10,
-      "points": 15,
-      "rank": null,
-      "wins": 5
     }
   ]
 }

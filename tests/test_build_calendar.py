@@ -4,6 +4,7 @@ import sys
 import tempfile
 import unittest
 from contextlib import redirect_stderr, redirect_stdout
+from dataclasses import replace
 from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
 from unittest import mock
@@ -100,10 +101,23 @@ class TeamPageTests(unittest.TestCase):
         self.assertEqual((kil.played, kil.wins, kil.goals_for, kil.goals_against, kil.goal_diff, kil.points), (2, 2, 15, 1, 10, 6))
         self.assertEqual(rows[3].record, "0-1-1")
 
-    def test_opponents_from_other_groups_are_unranked(self):
+    def test_promoted_opponent_from_another_group_is_slotted_in_by_points(self):
         rows = bc.parse_team_page(fixture("team_2024f.html"), CODE, TZ).season.standings.rows
-        self.assertEqual([(r.code, r.rank) for r in rows],
-                         [("FRU", 1), ("WAS", 2), ("KIL", 3), ("VVI", 4), ("OFL", 5), ("SPI", 6), ("HFL", None)])
+        # Hot Flashes (17 pts) are listed in the lower group; our group keeps the league's order.
+        self.assertEqual([(r.code, r.points, r.rank) for r in rows],
+                         [("FRU", 23, 1), ("WAS", 22, 2), ("KIL", 19, 3), ("HFL", 17, 4), ("VVI", 14, 5), ("OFL", 6, 6), ("SPI", 2, 7)])
+
+    def test_slotting_ties_go_after_and_fall_back_to_goal_difference(self):
+        def cells(code, pts, gd, gf):
+            values = ["5.0", code, "10", "0", "0", "0", "0", str(gf), "0", str(gd), str(pts)]
+            row = [bc.Cell(text=v) for v in values]
+            row[1].links.append([f"Team.php?PARAM_TEAM_CODE={code}", code])
+            return row
+        spacer = [bc.Cell(header=True)]
+        rows = [cells("VVI", 10, 3, 9), cells("AAA", 10, 1, 9), cells("BBB", 4, 0, 5), spacer,
+                cells("TIE", 10, 1, 9), cells("MID", 10, 2, 1), cells("OUT", 30, 9, 9)]
+        standings = bc.parse_standings(rows, "VVI", {"VVI", "AAA", "BBB", "TIE", "MID"})
+        self.assertEqual([r.code for r in standings.rows], ["VVI", "MID", "AAA", "TIE", "BBB"])
 
     def test_forfeit_and_noon_kickoff(self):
         games = bc.parse_team_page(fixture("team_2024f.html"), CODE, TZ).season.games
@@ -125,10 +139,12 @@ class TeamPageTests(unittest.TestCase):
             bc.parse_team_page(html, CODE, TZ)
         self.assertEqual(bc.parse_team_page(html, CODE, TZ, require_schedule=False).season.games, [])
 
-    def test_home_marking_must_match_game_code(self):
-        html = fixture("team_2026f.html").replace("G0_WAS_VVI", "G0_VVI_WAS", 2)
-        with self.assertRaisesRegex(bc.PageError, "bold"):
-            bc.parse_team_page(html, CODE, TZ)
+    def test_home_marking_that_disagrees_with_game_code_is_flagged(self):
+        html = fixture("team_2026f.html").replace("G0_WAS_VVI", "G1_VVI_WAS", 2)
+        first = bc.parse_team_page(html, CODE, TZ).season.games[0]
+        self.assertTrue(first.home)
+        self.assertTrue(first.home_unclear)
+        self.assertFalse(any(g.home_unclear for g in bc.parse_team_page(fixture("team_2026f.html"), CODE, TZ).season.games))
 
     def test_unexpected_row_shape_fails(self):
         html = fixture("team_2026f.html").replace(">league</a></td>", ">league</a></td><td>extra</td>", 1)
@@ -197,11 +213,6 @@ class SummaryTests(unittest.TestCase):
         g = game(home=False, opponent="Killer Tomatoes", opponent_code="KIL")
         self.assertEqual(bc.build_summary(g, TEAM, CODE, True, STANDINGS), "Killer Tomatoes (1st, 2-0) vs Vintage Vikings (4th, 0-1-1)")
 
-    def test_featured_opponent_from_another_group_shows_record_only(self):
-        standings = bc.Standings(STANDINGS.rows + [bc.Standing("HFL", "Hot Flashes", None, 8, 5, 3, 0, 2, 22, 15, 6, 11)])
-        g = game(opponent="Hot Flashes", opponent_code="HFL")
-        self.assertEqual(bc.build_summary(g, TEAM, CODE, True, standings), "Vintage Vikings (4th, 0-1-1) vs Hot Flashes (5-3)")
-
     def test_result_home_first_with_our_perspective_letter(self):
         g = game(home=False, result="L", ours="2", theirs="3")
         self.assertEqual(bc.build_summary(g, TEAM, CODE, False, None), "Wasabi 3 - 2 Vintage Vikings (L)")
@@ -239,10 +250,9 @@ class DescriptionTests(unittest.TestCase):
         self.assertIn("4. Vintage Vikings 0-1-1, 1 pts, GD -1", text)  # rank as the table has it
         self.assertNotIn("Elliott", text)
 
-    def test_other_group_listed_after_our_group(self):
-        standings = bc.Standings(STANDINGS.rows + [bc.Standing("HFL", "Hot Flashes", None, 8, 5, 3, 0, 2, 22, 15, 6, 11)])
-        text = bc.build_description(game(result="W", ours="2", theirs="1"), TEAM, CODE, standings)
-        self.assertTrue(text.endswith("4. Vintage Vikings 0-1-1, 1 pts, GD -1\nOther groups:\n- Hot Flashes 5-3, 11 pts, GD +6"))
+    def test_unclear_home_team_is_explained(self):
+        text = bc.build_description(game(home_unclear=True), TEAM, CODE, None)
+        self.assertIn("Vintage Vikings (home) vs Wasabi (away)\nHome and away are unclear", text)
 
     def test_rained_out_and_time_tbd(self):
         text = bc.build_description(game(status="rainout", all_day=True), TEAM, CODE, None)
@@ -329,6 +339,7 @@ class CacheTests(unittest.TestCase):
         original = bc.parse_team_page(fixture("team_2026f.html"), CODE, TZ).season
         original = bc.Season(original.code, original.name, original.games + [game(code="G9", all_day=True, start=datetime(2026, 12, 6, tzinfo=TZ))],
                              original.standings, {"G0_WAS_VVI": original.standings})
+        original.games[1] = replace(original.games[1], home_unclear=True)
         restored = bc.season_from_json(json.loads(json.dumps(bc.season_to_json(original))), TZ)
         self.assertEqual(restored, original)
 
