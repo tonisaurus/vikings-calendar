@@ -59,6 +59,15 @@ for (after any team it ties with). Our group's own order is kept exactly as the 
 - If the site is unreachable the run retries a few times, then fails without committing, so subscribers keep
   the last good calendar. A run that would publish an empty calendar fails the same way.
 
+## TeamSnap
+
+TeamSnap cannot subscribe to an outside calendar feed, but it imports schedules from CSV. Each run also writes
+[`docs/vikings-teamsnap.csv`](docs/vikings-teamsnap.csv) (linked from the landing page): the latest season's
+games in TeamSnap's [team schedule import template](https://go.teamsnap.com/files/teamsnap_schedule_template.csv)
+format, with called-off games left out. The location name is the venue (`Beach Chalet`), the address its street
+address and the location details the field (`Beach #4 (Turf)`). Import it once at the start of a season;
+re-importing adds duplicates, and deleting games to re-import them loses attendance.
+
 ## Alerting
 
 - A failed run opens a GitHub issue labelled `calendar-alert` (or comments on the open one) with a link to
@@ -81,7 +90,7 @@ and one per venue the calendar has not seen before. So 1 request most of the yea
 
 ```bash
 python3 build_calendar.py --dry-run   # print the calendar
-python3 build_calendar.py             # write docs/vikings.ics, state.json, venues.json and seasons/
+python3 build_calendar.py             # write docs/vikings.ics, docs/vikings-teamsnap.csv, state.json, venues.json and seasons/
 python3 -m unittest discover -s tests # run the tests
 ```
 

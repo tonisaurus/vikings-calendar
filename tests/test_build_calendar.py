@@ -21,7 +21,7 @@ NOW = datetime(2026, 9, 27, 18, 0, tzinfo=timezone.utc)  # Sunday 11am PDT
 CONFIG = {
     "team": TEAM, "team_code": CODE, "calendar_name": "Vintage Vikings Soccer", "timezone": "America/Los_Angeles",
     "site": "https://www.ggwsl.org", "game_minutes": 90, "keep_seasons": 4, "output": "docs/vikings.ics",
-    "state_file": "state.json", "venues_file": "venues.json", "cache_dir": "seasons",
+    "teamsnap_output": "docs/vikings-teamsnap.csv", "state_file": "state.json", "venues_file": "venues.json", "cache_dir": "seasons",
 }
 
 
@@ -196,8 +196,11 @@ class FieldParsingTests(unittest.TestCase):
         self.assertEqual(bc.parse_result("CCD", "1", "0", "scheduled"), ("CCD", False))
 
     def test_venue_address(self):
-        self.assertEqual(bc.parse_venue(fixture("venue_BEA.html"), "BEA"),
-                         "Beach Chalet, 1500 John F Kennedy, Golden Gate Park, San Francisco, CA")
+        venue = bc.parse_venue(fixture("venue_BEA.html"), "BEA")
+        self.assertEqual(venue, bc.Venue("Beach Chalet", "1500 John F Kennedy, Golden Gate Park, San Francisco, CA"))
+        self.assertEqual(venue.location, "Beach Chalet, 1500 John F Kennedy, Golden Gate Park, San Francisco, CA")
+        self.assertEqual(bc.parse_venue('<a name="#X"></a><h3>Kezar Stadium</h3>', "X"), bc.Venue("Kezar Stadium", ""))
+        self.assertEqual(bc.Venue("Kezar Stadium", "").location, "Kezar Stadium")
         self.assertIsNone(bc.parse_venue(fixture("venue_BEA.html"), "ALA"))
 
 
@@ -370,7 +373,7 @@ class BuildTests(unittest.TestCase):
         self.played = game(code="G0_WAS_VVI", home=False, start=datetime(2026, 9, 20, 11, tzinfo=TZ), result="L", ours="2", theirs="3")
         self.today = game(code="G0_KIL_VVI", home=False, opponent="Killer Tomatoes", opponent_code="KIL", venue_code="ALA")
         self.seasons = [season([self.played, self.today])]
-        self.venues = {"BEA": "Beach Chalet, 1500 John F Kennedy, San Francisco, CA"}
+        self.venues = {"BEA": bc.Venue("Beach Chalet", "1500 John F Kennedy, San Francisco, CA")}
 
     def events(self, calendar):
         unfolded = calendar.replace("\r\n ", "")
@@ -400,6 +403,27 @@ class BuildTests(unittest.TestCase):
         uid = "ggwsl-2026f-G0_KIL_VVI@vikings-calendar"
         self.assertEqual(changed[uid]["sequence"], 1)
         self.assertEqual(changed[uid]["last_modified"], later.isoformat())
+
+    def test_teamsnap_csv(self):
+        spring = season([game(code="OLD", start=datetime(2026, 5, 3, 9, tzinfo=TZ), season="2026s")], code="2026s")
+        fall = season([
+            self.played,
+            game(code="RAIN", status="rainout", start=datetime(2026, 10, 4, 9, tzinfo=TZ)),
+            game(code="TBD", opponent="Old Flames, Jr.", venue_code="TBD", all_day=True, start=datetime(2026, 12, 6, tzinfo=TZ)),
+        ])
+        rows = bc.build_teamsnap_csv(CONFIG, [spring, fall], self.venues).split("\r\n")
+        self.assertEqual(rows[0].split(","), bc.TEAMSNAP_COLUMNS)
+        self.assertEqual(rows[1], '09/20/2026,11:00 AM,1:30,,,Wasabi,,,,Beach Chalet,"1500 John F Kennedy, San Francisco, CA",'
+                                  'Beach #4 (Turf),,a,,,League game (Fall 2026)')
+        self.assertEqual(rows[2], '12/06/2026,,1:30,,,"Old Flames, Jr.",,,,Beach #4 (Turf),,Beach #4 (Turf),,h,,,League game (Fall 2026)')
+        self.assertEqual(rows[3:], [""])  # the rained-out game and the spring season are left out
+
+    def test_teamsnap_csv_template_headings(self):
+        # The template's first column is an instruction to delete it; the rest must match exactly.
+        template = ("Delete this column before saving for import!,Date,Time,Duration (HH:MM),Arrival Time (Minutes),Name,"
+                    "Opponent Name,Opponent Contact Name,Opponent Contact Phone Number,Opponent Contact E-mail Address,"
+                    "Location Name,Location Address,Location Details,Location URL,Home or Away,Uniform,Extra Label,Notes")
+        self.assertEqual(bc.TEAMSNAP_COLUMNS, template.split(",")[1:])
 
     def test_cancelled_status(self):
         calendar, _ = bc.build(CONFIG, [season([game(status="rainout")])], {}, {}, NOW)
@@ -472,8 +496,9 @@ class LoadSeasonsTests(unittest.TestCase):
                          "https://www.ggwsl.org/LibLeague/Direct.php?PARAM_VENUE_CODE=ALA": "<html></html>"})
         games = [game(), game(code="X", venue_code="ALA"), game(code="Y", venue_code="OLD")]
         with mock.patch.object(bc, "fetch_text", site), redirect_stderr(io.StringIO()) as err:
-            venues = bc.load_venues(CONFIG, {"OLD": "Old Field"}, games)
-        self.assertEqual(venues, {"OLD": "Old Field", "BEA": "Beach Chalet, 1500 John F Kennedy, Golden Gate Park, San Francisco, CA"})
+            venues = bc.load_venues(CONFIG, {"OLD": {"name": "Old Field", "address": "1 Main St"}}, games)
+        self.assertEqual(venues, {"OLD": bc.Venue("Old Field", "1 Main St"),
+                                  "BEA": bc.Venue("Beach Chalet", "1500 John F Kennedy, Golden Gate Park, San Francisco, CA")})
         self.assertIn("ALA", err.getvalue())
 
 
@@ -501,7 +526,10 @@ class MainTests(unittest.TestCase):
         self.assertIn(b"\r\n", calendar)
         self.assertTrue((self.root / "seasons/2026f.json").exists())
         self.assertEqual(len(json.loads((self.root / "state.json").read_text())), 10)
-        self.assertIn("BEA", json.loads((self.root / "venues.json").read_text()))
+        self.assertEqual(json.loads((self.root / "venues.json").read_text())["BEA"]["name"], "Beach Chalet")
+        csv_bytes = (self.root / "docs/vikings-teamsnap.csv").read_bytes()
+        self.assertTrue(csv_bytes.startswith(b"Date,Time,Duration (HH:MM),"))
+        self.assertEqual(csv_bytes.count(b"\r\n"), 11)
 
     def test_broken_page_fails_without_writing(self):
         code, err = self.run_main(FakeSite({CURRENT_URL: "<html>maintenance</html>"}))

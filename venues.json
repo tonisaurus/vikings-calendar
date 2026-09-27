@@ -1,8 +1,26 @@
 {
-  "ALA": "Alameda Estuary Park, 230-200 Mosley Ave, Alameda, CA, 94501",
-  "BEA": "Beach Chalet, 1500 John F Kennedy, Golden Gate Park, San Francisco, CA",
-  "CAM": "Crocker Amazon Playground, Geneva Ave, San Francisco, CA",
-  "FSQ": "Franklin Square, 16th & Bryant, San Francisco, CA",
-  "JLF": "James Lang Fields, 901 Turk St, San Francisco, CA, 94102",
-  "TBF": "Tom Bates (Gilman), 400 Gilman Street, Berkeley, CA"
+  "ALA": {
+    "address": "230-200 Mosley Ave, Alameda, CA, 94501",
+    "name": "Alameda Estuary Park"
+  },
+  "BEA": {
+    "address": "1500 John F Kennedy, Golden Gate Park, San Francisco, CA",
+    "name": "Beach Chalet"
+  },
+  "CAM": {
+    "address": "Geneva Ave, San Francisco, CA",
+    "name": "Crocker Amazon Playground"
+  },
+  "FSQ": {
+    "address": "16th & Bryant, San Francisco, CA",
+    "name": "Franklin Square"
+  },
+  "JLF": {
+    "address": "901 Turk St, San Francisco, CA, 94102",
+    "name": "James Lang Fields"
+  },
+  "TBF": {
+    "address": "400 Gilman Street, Berkeley, CA",
+    "name": "Tom Bates (Gilman)"
+  }
 }

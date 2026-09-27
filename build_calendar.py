@@ -20,7 +20,9 @@ Stdlib only, so it runs anywhere Python 3.9+ is installed.
 from __future__ import annotations
 
 import argparse
+import csv
 import hashlib
+import io
 import json
 import re
 import sys
@@ -155,6 +157,16 @@ class Season:
     @property
     def last_game_day(self) -> date | None:
         return max((g.start.date() for g in self.games), default=None)
+
+
+@dataclass(frozen=True)
+class Venue:
+    name: str  # e.g. "Beach Chalet"
+    address: str  # e.g. "1500 John F Kennedy, Golden Gate Park, San Francisco, CA"; "" when the league gives none
+
+    @property
+    def location(self) -> str:
+        return f"{self.name}, {self.address}" if self.address else self.name
 
 
 @dataclass(frozen=True)
@@ -453,13 +465,14 @@ def parse_team_page(html: str, team_code: str, tz: ZoneInfo, require_schedule: b
     )
 
 
-def parse_venue(html: str, venue_code: str) -> str | None:
-    """'Beach Chalet - 1500 John F Kennedy, Golden Gate Park, San Francisco, CA, ' -> a clean address."""
+def parse_venue(html: str, venue_code: str) -> Venue | None:
+    """The venue page heading, 'Beach Chalet - 1500 John F Kennedy, Golden Gate Park, San Francisco, CA, '."""
     match = re.search(rf'<a name="#?{re.escape(venue_code)}">\s*</a>\s*<h3[^>]*>(.*?)</h3>', html, re.DOTALL | re.IGNORECASE)
     if not match:
         return None
     heading = " ".join(re.sub(r"<[^>]+>", "", match.group(1)).split()).strip(" ,")
-    return heading.replace(" - ", ", ", 1) or None
+    name, _, address = heading.partition(" - ")
+    return Venue(name.strip(), address.strip(" ,")) if name.strip() else None
 
 
 # ------------------------------------------------------------------------ fetching
@@ -603,14 +616,14 @@ def load_seasons(config: dict, cache_dir: Path, today: date, tz: ZoneInfo) -> tu
     return sorted(seasons, key=lambda s: min((g.start for g in s.games), default=datetime.max.replace(tzinfo=tz))), stale
 
 
-def load_venues(config: dict, known: dict[str, str], games: list[Game]) -> dict[str, str]:
-    """Venue code -> address, fetching only venues not seen before. A venue page that cannot be read
+def load_venues(config: dict, known: dict[str, dict], games: list[Game]) -> dict[str, Venue]:
+    """Venue code -> venue, fetching only venues not seen before. A venue page that cannot be read
     is skipped (the event falls back to the field name) and retried on the next run."""
-    venues = dict(known)
+    venues = {code: Venue(**raw) for code, raw in known.items()}
     for code in sorted({g.venue_code for g in games if g.venue_code} - set(venues)):
-        address = parse_venue(fetch_text(venue_url(config["site"], code)), code)
-        if address:
-            venues[code] = address
+        venue = parse_venue(fetch_text(venue_url(config["site"], code)), code)
+        if venue:
+            venues[code] = venue
         else:
             print(f"warning: no address found on the venue page for {code}", file=sys.stderr)
     return venues
@@ -849,7 +862,12 @@ def next_state(previous: dict | None, digest: str, now: datetime) -> dict:
 # ----------------------------------------------------------------------------- main
 
 
-def build(config: dict, seasons: list[Season], venues: dict[str, str], state: dict, now: datetime) -> tuple[str, dict]:
+def location(game: Game, venues: dict[str, Venue]) -> str:
+    venue = venues.get(game.venue_code or "")
+    return venue.location if venue else game.field
+
+
+def build(config: dict, seasons: list[Season], venues: dict[str, Venue], state: dict, now: datetime) -> tuple[str, dict]:
     team, team_code = config["team"], config["team_code"]
     tz = ZoneInfo(config["timezone"])
     length = timedelta(minutes=config["game_minutes"])
@@ -864,16 +882,51 @@ def build(config: dict, seasons: list[Season], venues: dict[str, str], state: di
         table, note = standings_for(game, by_code[game.season], is_featured, now)
         summary = build_summary(game, team, team_code, is_featured, table)
         description = build_description(game, team, team_code, table, note)
-        location = venues.get(game.venue_code or "", game.field)
+        where = location(game, venues)
         uid = event_uid(game)
-        digest = content_hash(summary, description, event_times(game, length), game.status, location)
+        digest = content_hash(summary, description, event_times(game, length), game.status, where)
         entry = next_state(state.get(uid), digest, now)
         new_state[uid] = entry
         modified = datetime.fromisoformat(entry["last_modified"])
         description += f"\n\nUpdated {modified.astimezone(tz).strftime('%b %-d, %Y %-I:%M %p %Z')}"
-        events.append(render_event(game, length, summary, description, location, entry["sequence"], modified))
+        events.append(render_event(game, length, summary, description, where, entry["sequence"], modified))
 
     return render_calendar(config["calendar_name"], config["timezone"], events), new_state
+
+
+# TeamSnap's team schedule import template (https://go.teamsnap.com/files/teamsnap_schedule_template.csv),
+# minus its first column, which the template says to delete. Headings must match it exactly.
+TEAMSNAP_COLUMNS = [
+    "Date", "Time", "Duration (HH:MM)", "Arrival Time (Minutes)", "Name", "Opponent Name", "Opponent Contact Name",
+    "Opponent Contact Phone Number", "Opponent Contact E-mail Address", "Location Name", "Location Address",
+    "Location Details", "Location URL", "Home or Away", "Uniform", "Extra Label", "Notes",
+]
+
+
+def build_teamsnap_csv(config: dict, seasons: list[Season], venues: dict[str, Venue]) -> str:
+    """The latest season's games in TeamSnap's schedule import format, for importing at the start of a
+    season. Called-off games are left out. A game without a kickoff time yet has an empty time."""
+    season = next((s for s in reversed(seasons) if s.games), None)
+    minutes = config["game_minutes"]
+    out = io.StringIO()
+    writer = csv.DictWriter(out, TEAMSNAP_COLUMNS, lineterminator="\r\n")
+    writer.writeheader()
+    for game in season.games if season else []:
+        if game.is_cancelled:
+            continue
+        venue = venues.get(game.venue_code or "")
+        writer.writerow({
+            "Date": game.start.strftime("%m/%d/%Y"),
+            "Time": "" if game.all_day else game.start.strftime("%-I:%M %p"),
+            "Duration (HH:MM)": f"{minutes // 60}:{minutes % 60:02d}",
+            "Opponent Name": game.opponent,
+            "Location Name": venue.name if venue else game.field,
+            "Location Address": venue.address if venue else "",
+            "Location Details": game.field,
+            "Home or Away": "h" if game.home else "a",
+            "Notes": f"{game.competition.title()} game ({season.name})",
+        })
+    return out.getvalue()
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -913,11 +966,12 @@ def main(argv: list[str] | None = None) -> int:
         write_json(cache_dir / f"{season.code}.json", season_to_json(season))
     for code in stale:
         (cache_dir / f"{code}.json").unlink()
-    write_json(venues_path, venues)
+    write_json(venues_path, {code: venue.__dict__ for code, venue in sorted(venues.items())})
     write_json(state_path, new_state)
     output = root / config["output"]
     output.parent.mkdir(parents=True, exist_ok=True)
     output.write_bytes(calendar.encode("utf-8"))  # bytes, so CRLF line endings survive on every platform
+    (root / config["teamsnap_output"]).write_bytes(build_teamsnap_csv(config, seasons, venues).encode("utf-8"))
     print(f"wrote {output.relative_to(root)} with {len(new_state)} events from {len(seasons)} season(s): "
           + ", ".join(s.name for s in seasons))
     return 0

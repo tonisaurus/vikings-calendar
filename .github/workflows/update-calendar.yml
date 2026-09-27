@@ -47,7 +47,7 @@ jobs:
           fi
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add docs/vikings.ics state.json venues.json seasons/
+          git add docs/vikings.ics docs/vikings-teamsnap.csv state.json venues.json seasons/
           git commit -m "Update calendar $(date -u +%Y-%m-%d)"
           git push
 

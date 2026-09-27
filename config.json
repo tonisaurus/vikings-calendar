@@ -7,6 +7,7 @@
   "game_minutes": 90,
   "keep_seasons": 4,
   "output": "docs/vikings.ics",
+  "teamsnap_output": "docs/vikings-teamsnap.csv",
   "state_file": "state.json",
   "venues_file": "venues.json",
   "cache_dir": "seasons"
