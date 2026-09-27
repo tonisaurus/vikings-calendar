@@ -472,8 +472,7 @@ class ChangeTests(unittest.TestCase):
     def test_rained_out_and_home_away_swap(self):
         self.assertEqual(self.changes(self.played, replace(self.next, status="rainout")), [
             "Changed: Sun Oct 18 vs Old Flames (away)\n  Status: Scheduled -> Rained out"])
-        self.assertEqual(self.changes(self.played, replace(self.next, home=True)), [
-            "Changed: Sun Oct 18 vs Old Flames (home)\n  Home/away: away -> home"])
+        self.assertEqual(self.changes(self.played, replace(self.next, home=True)), [])  # a home/away swap is not worth an email
 
     def test_added_and_removed(self):
         makeup = game(code="G2_VVI_WAS", start=datetime(2026, 12, 6, tzinfo=TZ), all_day=True)
@@ -490,10 +489,9 @@ class ChangeTests(unittest.TestCase):
 
     def test_report(self):
         report = bc.change_report({**CONFIG, "page_url": "https://example.test/"}, ["A", "B"])
-        self.assertEqual(report["subject"], "Vintage Vikings schedule: 2 changes")
+        self.assertEqual(report["subject"], "[automated] Vintage Vikings schedule update")
         self.assertEqual(report["body"], "A\n\nB\n\nThe calendar subscription updates on its own. TeamSnap does not, "
                                          "so update it by hand.\n\nCalendar and TeamSnap CSV: https://example.test/\n")
-        self.assertEqual(bc.change_report({**CONFIG, "page_url": "x"}, ["A"])["subject"], "Vintage Vikings schedule: 1 change")
 
 
 # ---------------------------------------------------------------------------- loading
@@ -608,7 +606,7 @@ class MainTests(unittest.TestCase):
             with mock.patch.object(bc, "fetch_text", site), redirect_stderr(io.StringIO()), redirect_stdout(io.StringIO()):
                 self.assertEqual(bc.main(["--config", str(self.config), "--changes-file", str(changes)]), 0)
                 report = json.loads(changes.read_text())
-                self.assertEqual(report["subject"], "Vintage Vikings schedule: 1 change")
+                self.assertEqual(report["subject"], "[automated] Vintage Vikings schedule update")
                 self.assertIn("The Fall 2026 schedule is up: 8 upcoming games.", report["body"])
                 changes.unlink()
                 self.assertEqual(bc.main(["--config", str(self.config), "--changes-file", str(changes)]), 0)

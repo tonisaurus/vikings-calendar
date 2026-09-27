@@ -70,12 +70,12 @@ re-importing adds duplicates, and deleting games to re-import them loses attenda
 
 ## Schedule change emails
 
-When a game that has not been played yet changes (date, time, venue, field, opponent, home/away, or status
-such as rained out), is added or removed, or a new season's schedule appears, the run emails the changes. Scores
-and standings do not count. For example:
+When a game that has not been played yet changes (date, time, venue, field, opponent, or status such as
+rained out), is added or removed, or a new season's schedule appears, the run emails the changes. Scores,
+standings and home/away swaps do not count. For example:
 
 ```
-Subject: Vintage Vikings schedule: 1 change
+Subject: [automated] Vintage Vikings schedule update
 
 Changed: Sun Oct 18 vs Old Flames (away)
   Time: 9:00 AM -> 11:00 AM

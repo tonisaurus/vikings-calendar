@@ -38,7 +38,7 @@ def test_report(config: dict) -> dict[str, str]:
         "This is a test of the schedule change alerts. Nothing has changed. A real alert looks like this:",
         EXAMPLE_CHANGE,
     ])
-    return {"subject": f"{config['team']} schedule: test alert", "body": report["body"]}
+    return {"subject": f"{report['subject']} (test)", "body": report["body"]}
 
 
 def build_message(report: dict[str, str], sender: str, to: list[str]) -> EmailMessage:

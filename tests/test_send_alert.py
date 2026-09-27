@@ -30,7 +30,7 @@ class SendAlertTests(unittest.TestCase):
     def test_sends_report_to_bcc_recipients(self):
         with tempfile.TemporaryDirectory() as tmp:
             report = Path(tmp) / "changes.json"
-            report.write_text(json.dumps({"subject": "Vintage Vikings schedule: 1 change", "body": "Changed: ...\n"}))
+            report.write_text(json.dumps({"subject": "[automated] Vintage Vikings schedule update", "body": "Changed: ...\n"}))
             code, out, _ = self.run_main([str(report)], ENV)
         self.assertEqual(code, 0)
         self.assertIn("to 2 recipient(s)", out)
@@ -38,7 +38,7 @@ class SendAlertTests(unittest.TestCase):
         self.assertEqual(self.smtp_class.call_args.args, ("smtp.gmail.com", 465))
         self.smtp.login.assert_called_once_with("sender@example.test", "app-password")
         message = self.smtp.send_message.call_args.args[0]
-        self.assertEqual(message["Subject"], "Vintage Vikings schedule: 1 change")
+        self.assertEqual(message["Subject"], "[automated] Vintage Vikings schedule update")
         self.assertEqual(message["To"], "sender@example.test")
         self.assertEqual(message["Bcc"], "a@example.test, b@example.test")
         self.assertEqual(message.get_content(), "Changed: ...\n")
@@ -48,7 +48,7 @@ class SendAlertTests(unittest.TestCase):
         self.assertEqual(code, 0)
         self.assertEqual(self.smtp_class.call_args.args, ("smtp.example.test", 2465))
         message = self.smtp.send_message.call_args.args[0]
-        self.assertEqual(message["Subject"], "Vintage Vikings schedule: test alert")
+        self.assertEqual(message["Subject"], "[automated] Vintage Vikings schedule update (test)")
         self.assertIn("This is a test", message.get_content())
         self.assertIn(send_alert.EXAMPLE_CHANGE, message.get_content())
 

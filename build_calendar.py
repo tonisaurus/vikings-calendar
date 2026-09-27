@@ -866,12 +866,12 @@ def next_state(previous: dict | None, digest: str, now: datetime) -> dict:
 
 
 def game_facts(game: Game, venues: dict[str, Venue]) -> dict[str, str]:
-    """What a player needs to show up at the right place and time, as the alert email words it."""
+    """What a player needs to show up at the right place and time, as the alert email words it. Home and
+    away are left out: a swap changes nothing about when and where to play."""
     return {
         "Date": f"{game.start:%a %b} {game.start.day}",
         "Time": "not set yet" if game.all_day else game.start.strftime("%-I:%M %p"),
         "Opponent": game.opponent,
-        "Home/away": "home" if game.home else "away",
         "Location": location(game, venues),
         "Field": game.field,
         "Status": game.status_label,
@@ -919,7 +919,7 @@ def detect_changes(before: dict[str, Season], after: list[Season], venues: dict[
 
 
 def change_report(config: dict, changes: list[str]) -> dict[str, str]:
-    subject = f"{config['team']} schedule: {len(changes)} change{'s' if len(changes) != 1 else ''}"
+    subject = f"[automated] {config['team']} schedule update"
     body = "\n\n".join(changes + [
         "The calendar subscription updates on its own. TeamSnap does not, so update it by hand.",
         f"Calendar and TeamSnap CSV: {config['page_url']}",
