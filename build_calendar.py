@@ -636,14 +636,13 @@ def load_venues(config: dict, known: dict[str, dict], games: list[Game]) -> dict
 
 
 def table_after(game: Game, season: Season) -> Standings | None:
-    """The table as it stood after `game`: its recorded snapshot, or the final table for the last
-    game of a finished season (seasons cached before snapshots existed have only that one)."""
-    if game.code in season.snapshots:
-        return season.snapshots[game.code]
-    played = [g for g in season.games if g.has_result]
-    if len(played) == len(season.games) and played and game is played[-1]:
+    """The table as it stood after `game`. A season's last game shows the season's final table, which
+    keeps taking late score updates until the season is cached; other games show their recorded
+    snapshot, when there is one. The last game is the last one played with nothing but called-off
+    games after it."""
+    if game.has_result and not any(g.start > game.start and not g.is_cancelled for g in season.games):
         return season.standings
-    return None
+    return season.snapshots.get(game.code)
 
 
 def standings_for(game: Game, season: Season, featured: bool, now: datetime) -> tuple[Standings | None, str | None]:

@@ -266,20 +266,31 @@ class StandingsChoiceTests(unittest.TestCase):
     def test_played_game_uses_its_snapshot(self):
         played = game(result="W", ours="1", theirs="0")
         snap = bc.Standings([row("VVI", "V", 1, wins=1)])
-        table, note = bc.standings_for(played, season([played, game(code="G1")], snapshots={played.code: snap}), False, NOW)
+        table, note = bc.standings_for(played, season([played, game(code="G1", start=datetime(2026, 10, 4, 15, tzinfo=TZ))], snapshots={played.code: snap}), False, NOW)
         self.assertIs(table, snap)
         self.assertIsNone(note)
 
     def test_played_game_without_snapshot_has_no_table(self):
         played = game(result="W", ours="1", theirs="0")
-        self.assertEqual(bc.standings_for(played, season([played, game(code="G1")]), False, NOW), (None, None))
+        self.assertEqual(bc.standings_for(played, season([played, game(code="G1", start=datetime(2026, 10, 4, 15, tzinfo=TZ))]), False, NOW), (None, None))
 
-    def test_last_game_of_finished_season_falls_back_to_final_table(self):
+    def test_last_game_of_season_shows_final_table_even_over_its_snapshot(self):
         first = game(code="G0", start=datetime(2026, 5, 3, 9, tzinfo=TZ), result="W", ours="1", theirs="0")
         last = game(code="G1", start=datetime(2026, 5, 10, 9, tzinfo=TZ), result="L", ours="0", theirs="1")
-        s = season([first, last])
-        self.assertIs(bc.table_after(last, s), STANDINGS)
-        self.assertIsNone(bc.table_after(first, s))
+        week_of = bc.Standings([row("VVI", "V", 1, wins=1, losses=1)])
+        self.assertIs(bc.table_after(last, season([first, last])), STANDINGS)
+        self.assertIs(bc.table_after(last, season([first, last], snapshots={"G1": week_of})), STANDINGS)
+        self.assertIsNone(bc.table_after(first, season([first, last])))
+
+    def test_final_table_goes_on_last_game_played_when_later_ones_were_called_off(self):
+        last = game(code="G0", start=datetime(2026, 5, 3, 9, tzinfo=TZ), result="W", ours="1", theirs="0")
+        rained = game(code="G1", start=datetime(2026, 5, 10, 9, tzinfo=TZ), status="rainout")
+        self.assertIs(bc.table_after(last, season([last, rained])), STANDINGS)
+
+    def test_no_final_table_while_games_remain(self):
+        played = game(code="G0", start=datetime(2026, 9, 20, 9, tzinfo=TZ), result="W", ours="1", theirs="0")
+        upcoming = game(code="G1", start=datetime(2026, 10, 4, 9, tzinfo=TZ))
+        self.assertIsNone(bc.table_after(played, season([played, upcoming])))
 
     def test_featured_game_notes(self):
         g = game()
