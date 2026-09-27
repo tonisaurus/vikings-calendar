@@ -104,19 +104,18 @@
     <h2>Google Calendar</h2>
     <p>Opens Google Calendar and asks you to add the subscription. On a phone, do this in a browser signed in to your Google account; the Google Calendar app then picks it up.</p>
     <a class="btn" id="google" href="#">Add to Google Calendar</a>
-    <ol>
-      <li>If the button does not work: open Google Calendar on the web, click the + next to "Other calendars", choose "From URL" and paste the link below.</li>
-    </ol>
+    <ul>
+      <li>If the button doesn't work: open Google Calendar on the web, click the + next to "Other calendars", choose "From URL" and paste the link below.</li>
+    </ul>
   </section>
 
   <section class="card">
-    <h2>Apple Calendar (iPhone, iPad, Mac)</h2>
+    <h2>Apple Calendar</h2>
     <p>Opens Calendar and asks you to subscribe.</p>
     <a class="btn" id="apple" href="#">Add to Apple Calendar</a>
-    <ol>
+    <ul>
       <li>On iPhone you can also go to Settings &rarr; Calendar &rarr; Accounts &rarr; Add Account &rarr; Other &rarr; Add Subscribed Calendar and paste the link below.</li>
-      <li>In the subscription settings, pick "Every day" for auto-refresh.</li>
-    </ol>
+    </ul>
   </section>
 
   <section class="card">
@@ -129,17 +128,14 @@
   </section>
 
   <section class="card">
-    <h2>TeamSnap (team managers)</h2>
-    <p>This season's games as a TeamSnap schedule import file. In TeamSnap on the web, go to Schedule &rarr; Import &rarr; Schedule from File.</p>
+    <h2>TeamSnap</h2>
+    <p>This season's games as a CSV, which TeamSnap accepts as an import file.</p>
     <a class="btn" href="vikings-teamsnap.csv" download>Download CSV</a>
-    <ol>
-      <li>Import once at the start of the season. Re-importing adds duplicate games, and deleting games to re-import loses everyone's attendance, so edit later changes by hand in TeamSnap.</li>
-    </ol>
   </section>
 
   <footer>
-    Data comes from the <a href="https://www.ggwsl.org">GGWSL website</a> and refreshes a few times a day. If the league ever redesigns its site, welp, the calendar takes a break until this catches up.
-    <a href="https://github.com/tonisaurus/vikings-calendar">Source on GitHub</a>.
+    Data comes from the <a href="https://www.ggwsl.org">GGWSL website</a> and fetches data a couple times a day to check for any updates. This calendar will likely break if the league's site is ever redesigned, in which case it'll be so long, farewell
+auf wiedersehn, goodnight 🫡
   </footer>
 </main>
 <script>
