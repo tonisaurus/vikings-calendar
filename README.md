@@ -68,6 +68,27 @@ format, with called-off games left out. The location name is the venue (`Beach C
 address and the location details the field (`Beach #4 (Turf)`). Import it once at the start of a season;
 re-importing adds duplicates, and deleting games to re-import them loses attendance.
 
+## Schedule change emails
+
+When a game that has not been played yet changes (date, time, venue, field, opponent, home/away, or status
+such as rained out), is added or removed, or a new season's schedule appears, the run emails the changes. Scores
+and standings do not count. For example:
+
+```
+Subject: Vintage Vikings schedule: 1 change
+
+Changed: Sun Oct 18 vs Old Flames (away)
+  Time: 9:00 AM -> 11:00 AM
+  Field: Beach #4 (Turf) -> Beach #2 (Turf)
+```
+
+[`send_alert.py`](send_alert.py) sends it over SMTP after the run's commit is pushed. Settings are repository
+secrets: `SMTP_USERNAME` and `SMTP_PASSWORD` (the sending account; for Gmail, an
+[app password](https://myaccount.google.com/apppasswords)) and `ALERT_EMAIL_TO` (comma-separated recipients,
+sent as Bcc so they do not see each other's addresses). Gmail's server is the default; set the `SMTP_HOST` and
+`SMTP_PORT` repository variables to use another provider. To check the setup, run the Update calendar workflow
+from the Actions tab with "Also send a test schedule-change email" ticked.
+
 ## Alerting
 
 - A failed run opens a GitHub issue labelled `calendar-alert` (or comments on the open one) with a link to
@@ -91,6 +112,7 @@ and one per venue the calendar has not seen before. So 1 request most of the yea
 ```bash
 python3 build_calendar.py --dry-run   # print the calendar
 python3 build_calendar.py             # write docs/vikings.ics, docs/vikings-teamsnap.csv, state.json, venues.json and seasons/
+python3 build_calendar.py --dry-run   # also prints any schedule changes (to stderr)
 python3 -m unittest discover -s tests # run the tests
 ```
 

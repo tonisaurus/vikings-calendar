@@ -62,7 +62,7 @@ FORFEIT = "FF"
 
 # Game states the league uses besides "scheduled". Called-off games stay in the calendar, marked
 # cancelled. Unknown states are shown as-is in the event title.
-STATUS_LABELS = {"cancelled": "Cancelled", "rainout": "Rained out", "postpnd": "Postponed", "earlyforfeit": "Forfeit"}
+STATUS_LABELS = {"scheduled": "Scheduled", "cancelled": "Cancelled", "rainout": "Rained out", "postpnd": "Postponed", "earlyforfeit": "Forfeit"}
 CALLED_OFF = {"cancelled", "canceled", "rainout", "postpnd"}
 EARLY_FORFEIT = "earlyforfeit"
 
@@ -586,7 +586,11 @@ def season_is_live(code: str, current: str, cached: Season | None, today: date) 
     return today <= cached.last_game_day + LIVE_AFTER_LAST_GAME
 
 
-def load_seasons(config: dict, cache_dir: Path, today: date, tz: ZoneInfo) -> tuple[list[Season], list[str]]:
+def read_cache(cache_dir: Path, tz: ZoneInfo) -> dict[str, Season]:
+    return {p.stem: season_from_json(json.loads(p.read_text(encoding="utf-8")), tz) for p in cache_dir.glob("*.json")}
+
+
+def load_seasons(config: dict, cached: dict[str, Season], today: date, tz: ZoneInfo) -> tuple[list[Season], list[str]]:
     """The seasons that belong in the calendar, plus the codes of cached seasons to delete.
 
     The team page for the current season comes first: it is both the current season's data and the
@@ -594,7 +598,6 @@ def load_seasons(config: dict, cache_dir: Path, today: date, tz: ZoneInfo) -> tu
     served from the cache afterwards.
     """
     site, team_code = config["site"], config["team_code"]
-    cached = {p.stem: season_from_json(json.loads(p.read_text(encoding="utf-8")), tz) for p in cache_dir.glob("*.json")}
 
     current = parse_team_page(fetch_text(team_url(site, team_code)), team_code, tz)
     keep = config.get("keep_seasons")
@@ -859,6 +862,71 @@ def next_state(previous: dict | None, digest: str, now: datetime) -> dict:
     return {"hash": digest, "sequence": sequence, "last_modified": now.isoformat()}
 
 
+# ---------------------------------------------------------------------- change alerts
+
+
+def game_facts(game: Game, venues: dict[str, Venue]) -> dict[str, str]:
+    """What a player needs to show up at the right place and time, as the alert email words it."""
+    return {
+        "Date": f"{game.start:%a %b} {game.start.day}",
+        "Time": "not set yet" if game.all_day else game.start.strftime("%-I:%M %p"),
+        "Opponent": game.opponent,
+        "Home/away": "home" if game.home else "away",
+        "Location": location(game, venues),
+        "Field": game.field,
+        "Status": game.status_label,
+    }
+
+
+def game_heading(game: Game) -> str:
+    return f"{game.start:%a %b} {game.start.day} vs {game.opponent} ({'home' if game.home else 'away'})"
+
+
+def detect_changes(before: dict[str, Season], after: list[Season], venues: dict[str, Venue], today: date) -> list[str]:
+    """Paragraphs describing schedule changes to games that have not been played yet: a new season's
+    schedule appearing, games added or removed, and any change to a game's facts (see game_facts).
+    Scores and standings are not schedule changes."""
+    def upcoming(game: Game) -> bool:
+        return game.start.date() >= today
+
+    changes = []
+    for season in after:
+        games = [g for g in season.games if upcoming(g)]
+        old_season = before.get(season.code)
+        if old_season is None or not old_season.games:
+            if games:
+                lines = [f"The {season.name} schedule is up: {len(games)} upcoming game{'s' if len(games) != 1 else ''}."]
+                lines += [f"  {game_heading(g)}, {game_facts(g, venues)['Time']}, {g.field}" for g in games]
+                changes.append("\n".join(lines))
+            continue
+        old = {g.code: g for g in old_season.games}
+        new = {g.code: g for g in season.games}
+        for code in sorted(set(old) | set(new), key=lambda c: (new.get(c) or old[c]).start):
+            was, now = old.get(code), new.get(code)
+            if not any(g is not None and upcoming(g) for g in (was, now)):
+                continue
+            if was is None:
+                facts = game_facts(now, venues)
+                changes.append(f"Added: {game_heading(now)}\n  {facts['Time']} at {facts['Location']}, {now.field}")
+            elif now is None:
+                changes.append(f"Removed: {game_heading(was)}, no longer on the league schedule")
+            else:
+                old_facts, new_facts = game_facts(was, venues), game_facts(now, venues)
+                diffs = [f"  {k}: {old_facts[k]} -> {v}" for k, v in new_facts.items() if old_facts[k] != v]
+                if diffs:
+                    changes.append("\n".join([f"Changed: {game_heading(now)}"] + diffs))
+    return changes
+
+
+def change_report(config: dict, changes: list[str]) -> dict[str, str]:
+    subject = f"{config['team']} schedule: {len(changes)} change{'s' if len(changes) != 1 else ''}"
+    body = "\n\n".join(changes + [
+        "The calendar subscription updates on its own. TeamSnap does not, so update it by hand.",
+        f"Calendar and TeamSnap CSV: {config['page_url']}",
+    ])
+    return {"subject": subject, "body": body + "\n"}
+
+
 # ----------------------------------------------------------------------------- main
 
 
@@ -933,6 +1001,7 @@ def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     parser.add_argument("--config", default="config.json", type=Path)
     parser.add_argument("--dry-run", action="store_true", help="print the calendar instead of writing files")
+    parser.add_argument("--changes-file", type=Path, help="write schedule changes here (JSON with subject and body), if there are any")
     args = parser.parse_args(argv)
 
     root = args.config.resolve().parent
@@ -942,8 +1011,10 @@ def main(argv: list[str] | None = None) -> int:
     cache_dir = root / config["cache_dir"]
     venues_path = root / config["venues_file"]
 
+    today = now.astimezone(tz).date()
+    cached = read_cache(cache_dir, tz)
     try:
-        seasons, stale = load_seasons(config, cache_dir, now.astimezone(tz).date(), tz)
+        seasons, stale = load_seasons(config, cached, today, tz)
         venues = load_venues(config, load_json(venues_path), [g for s in seasons for g in s.games])
     except (urllib.error.URLError, PageError) as exc:
         print(f"error: failed to read the league site: {exc}", file=sys.stderr)
@@ -958,8 +1029,11 @@ def main(argv: list[str] | None = None) -> int:
         print(f"error: found no games for {config['team_code']!r}; refusing to publish an empty calendar", file=sys.stderr)
         return 1
 
+    changes = detect_changes(cached, seasons, venues, today)
     if args.dry_run:
         sys.stdout.write(calendar)
+        for change in changes:
+            print(change, file=sys.stderr)
         return 0
 
     for season in seasons:
@@ -972,6 +1046,10 @@ def main(argv: list[str] | None = None) -> int:
     output.parent.mkdir(parents=True, exist_ok=True)
     output.write_bytes(calendar.encode("utf-8"))  # bytes, so CRLF line endings survive on every platform
     (root / config["teamsnap_output"]).write_bytes(build_teamsnap_csv(config, seasons, venues).encode("utf-8"))
+    if changes:
+        print("schedule changes:\n" + "\n".join(changes))
+        if args.changes_file:
+            write_json(args.changes_file, change_report(config, changes))
     print(f"wrote {output.relative_to(root)} with {len(new_state)} events from {len(seasons)} season(s): "
           + ", ".join(s.name for s in seasons))
     return 0

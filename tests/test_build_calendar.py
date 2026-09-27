@@ -430,6 +430,72 @@ class BuildTests(unittest.TestCase):
         self.assertEqual(self.events(calendar)[0]["STATUS"], "CANCELLED")
 
 
+VENUES = {"BEA": bc.Venue("Beach Chalet", "1500 John F Kennedy, San Francisco, CA"),
+          "ALA": bc.Venue("Alameda Estuary Park", "230-200 Mosley Ave, Alameda, CA")}
+
+
+class ChangeTests(unittest.TestCase):
+    TODAY = date(2026, 9, 27)
+
+    def setUp(self):
+        self.played = game(code="G0_WAS_VVI", home=False, start=datetime(2026, 9, 20, 11, tzinfo=TZ), result="L", ours="2", theirs="3")
+        self.next = game(code="G0_OFL_VVI", home=False, opponent="Old Flames", opponent_code="OFL", start=datetime(2026, 10, 18, 9, tzinfo=TZ))
+        self.before = {"2026f": season([self.played, self.next])}
+
+    def changes(self, *games, before=None):
+        return bc.detect_changes(self.before if before is None else before, [season(list(games))], VENUES, self.TODAY)
+
+    def test_nothing_changed(self):
+        self.assertEqual(self.changes(self.played, self.next), [])
+
+    def test_posted_scores_are_not_schedule_changes(self):
+        scored = replace(self.next, result="W", our_score="1", their_score="0")
+        self.assertEqual(self.changes(self.played, scored), [])
+
+    def test_past_games_are_ignored(self):
+        moved = replace(self.played, start=datetime(2026, 9, 20, 13, tzinfo=TZ), venue_code="ALA")
+        self.assertEqual(self.changes(moved, self.next), [])
+
+    def test_time_and_field_change(self):
+        moved = replace(self.next, start=datetime(2026, 10, 18, 11, tzinfo=TZ), field="Beach #2 (Turf)")
+        self.assertEqual(self.changes(self.played, moved), [
+            "Changed: Sun Oct 18 vs Old Flames (away)\n  Time: 9:00 AM -> 11:00 AM\n  Field: Beach #4 (Turf) -> Beach #2 (Turf)"])
+
+    def test_moved_to_another_day_and_venue(self):
+        moved = replace(self.next, start=datetime(2026, 10, 17, 15, tzinfo=TZ), venue_code="ALA", field="Alameda Estuary Park")
+        self.assertEqual(self.changes(self.played, moved), [(
+            "Changed: Sat Oct 17 vs Old Flames (away)\n  Date: Sun Oct 18 -> Sat Oct 17\n  Time: 9:00 AM -> 3:00 PM\n"
+            "  Location: Beach Chalet, 1500 John F Kennedy, San Francisco, CA -> Alameda Estuary Park, 230-200 Mosley Ave, Alameda, CA\n"
+            "  Field: Beach #4 (Turf) -> Alameda Estuary Park"
+        )])
+
+    def test_rained_out_and_home_away_swap(self):
+        self.assertEqual(self.changes(self.played, replace(self.next, status="rainout")), [
+            "Changed: Sun Oct 18 vs Old Flames (away)\n  Status: Scheduled -> Rained out"])
+        self.assertEqual(self.changes(self.played, replace(self.next, home=True)), [
+            "Changed: Sun Oct 18 vs Old Flames (home)\n  Home/away: away -> home"])
+
+    def test_added_and_removed(self):
+        makeup = game(code="G2_VVI_WAS", start=datetime(2026, 12, 6, tzinfo=TZ), all_day=True)
+        self.assertEqual(self.changes(self.played, makeup), [
+            "Removed: Sun Oct 18 vs Old Flames (away), no longer on the league schedule",
+            "Added: Sun Dec 6 vs Wasabi (home)\n  not set yet at Beach Chalet, 1500 John F Kennedy, San Francisco, CA, Beach #4 (Turf)"])
+
+    def test_new_season_schedule(self):
+        changes = self.changes(self.played, self.next, before={})
+        self.assertEqual(changes, ["The Fall 2026 schedule is up: 1 upcoming game.\n  Sun Oct 18 vs Old Flames (away), 9:00 AM, Beach #4 (Turf)"])
+
+    def test_finished_new_season_is_not_announced(self):
+        self.assertEqual(self.changes(self.played, before={}), [])
+
+    def test_report(self):
+        report = bc.change_report({**CONFIG, "page_url": "https://example.test/"}, ["A", "B"])
+        self.assertEqual(report["subject"], "Vintage Vikings schedule: 2 changes")
+        self.assertEqual(report["body"], "A\n\nB\n\nThe calendar subscription updates on its own. TeamSnap does not, "
+                                         "so update it by hand.\n\nCalendar and TeamSnap CSV: https://example.test/\n")
+        self.assertEqual(bc.change_report({**CONFIG, "page_url": "x"}, ["A"])["subject"], "Vintage Vikings schedule: 1 change")
+
+
 # ---------------------------------------------------------------------------- loading
 
 
@@ -471,7 +537,7 @@ class LoadSeasonsTests(unittest.TestCase):
     def test_fetches_current_and_uncached_seasons(self):
         site = FakeSite({CURRENT_URL: fixture("team_2026f.html"), season_url("2026s"): self.spring})
         with mock.patch.object(bc, "fetch_text", site):
-            seasons, stale = bc.load_seasons(self.config, self.cache, self.today, TZ)
+            seasons, stale = bc.load_seasons(self.config, bc.read_cache(self.cache, TZ), self.today, TZ)
         self.assertEqual(site.fetched, [CURRENT_URL, season_url("2026s")])
         self.assertEqual(stale, [])
         self.assertEqual({s.code for s in seasons}, {"2026f", "2026s"})
@@ -481,7 +547,7 @@ class LoadSeasonsTests(unittest.TestCase):
         self.cached("2025f", date(2025, 11, 23))
         site = FakeSite({CURRENT_URL: fixture("team_2026f.html")})
         with mock.patch.object(bc, "fetch_text", site):
-            seasons, stale = bc.load_seasons(self.config, self.cache, self.today, TZ)
+            seasons, stale = bc.load_seasons(self.config, bc.read_cache(self.cache, TZ), self.today, TZ)
         self.assertEqual(site.fetched, [CURRENT_URL])
         self.assertEqual(stale, ["2025f"])
         self.assertEqual({s.code for s in seasons}, {"2026f", "2026s"})
@@ -489,7 +555,7 @@ class LoadSeasonsTests(unittest.TestCase):
     def test_page_for_the_wrong_season_fails(self):
         site = FakeSite({CURRENT_URL: fixture("team_2026f.html"), season_url("2026s"): fixture("team_2024f.html")})
         with mock.patch.object(bc, "fetch_text", site), self.assertRaisesRegex(bc.PageError, "shows 2024f"):
-            bc.load_seasons(self.config, self.cache, self.today, TZ)
+            bc.load_seasons(self.config, bc.read_cache(self.cache, TZ), self.today, TZ)
 
     def test_venues_fetched_once(self):
         site = FakeSite({"https://www.ggwsl.org/LibLeague/Direct.php?PARAM_VENUE_CODE=BEA": fixture("venue_BEA.html"),
@@ -508,7 +574,7 @@ class MainTests(unittest.TestCase):
         self.addCleanup(self.dir.cleanup)
         self.root = Path(self.dir.name)
         self.config = self.root / "config.json"
-        self.config.write_text(json.dumps({**CONFIG, "keep_seasons": 1}))
+        self.config.write_text(json.dumps({**CONFIG, "keep_seasons": 1, "page_url": "https://example.test/"}))
 
     def run_main(self, site):
         with mock.patch.object(bc, "fetch_text", site), redirect_stderr(io.StringIO()) as err, redirect_stdout(io.StringIO()):
@@ -530,6 +596,23 @@ class MainTests(unittest.TestCase):
         csv_bytes = (self.root / "docs/vikings-teamsnap.csv").read_bytes()
         self.assertTrue(csv_bytes.startswith(b"Date,Time,Duration (HH:MM),"))
         self.assertEqual(csv_bytes.count(b"\r\n"), 11)
+
+    def test_changes_file_written_only_when_something_changed(self):
+        site = FakeSite({CURRENT_URL: fixture("team_2026f.html"),
+                         "https://www.ggwsl.org/LibLeague/Direct.php?PARAM_VENUE_CODE=BEA": fixture("venue_BEA.html"),
+                         "https://www.ggwsl.org/LibLeague/Direct.php?PARAM_VENUE_CODE=ALA": "<html></html>"})
+        changes = self.root / "changes.json"
+        now = datetime(2026, 9, 27, 18, 0, tzinfo=timezone.utc)
+        with mock.patch.object(bc, "datetime", wraps=datetime) as clock:
+            clock.now.return_value = now
+            with mock.patch.object(bc, "fetch_text", site), redirect_stderr(io.StringIO()), redirect_stdout(io.StringIO()):
+                self.assertEqual(bc.main(["--config", str(self.config), "--changes-file", str(changes)]), 0)
+                report = json.loads(changes.read_text())
+                self.assertEqual(report["subject"], "Vintage Vikings schedule: 1 change")
+                self.assertIn("The Fall 2026 schedule is up: 8 upcoming games.", report["body"])
+                changes.unlink()
+                self.assertEqual(bc.main(["--config", str(self.config), "--changes-file", str(changes)]), 0)
+        self.assertFalse(changes.exists())
 
     def test_broken_page_fails_without_writing(self):
         code, err = self.run_main(FakeSite({CURRENT_URL: "<html>maintenance</html>"}))

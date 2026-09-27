@@ -4,6 +4,7 @@
   "calendar_name": "Vintage Vikings Soccer",
   "timezone": "America/Los_Angeles",
   "site": "https://www.ggwsl.org",
+  "page_url": "https://tonisaurus.github.io/vikings-calendar/",
   "game_minutes": 90,
   "keep_seasons": 4,
   "output": "docs/vikings.ics",

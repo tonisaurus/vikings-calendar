@@ -8,6 +8,11 @@ on:
     # so the extra runs are free.
     - cron: "23 5,14,20 * * *"
   workflow_dispatch:
+    inputs:
+      send_test_email:
+        description: Also send a test schedule-change email to the alert recipients
+        type: boolean
+        default: false
   push:
     branches: [main]
     paths:
@@ -37,11 +42,11 @@ jobs:
           python-version: "3.12"
 
       - name: Build calendar from the GGWSL website
-        run: python build_calendar.py
+        run: python build_calendar.py --changes-file "$RUNNER_TEMP/changes.json"
 
       - name: Commit and push if anything changed
         run: |
-          if git diff --quiet; then
+          if [ -z "$(git status --porcelain)" ]; then
             echo "Calendar is up to date."
             exit 0
           fi
@@ -50,6 +55,33 @@ jobs:
           git add docs/vikings.ics docs/vikings-teamsnap.csv state.json venues.json seasons/
           git commit -m "Update calendar $(date -u +%Y-%m-%d)"
           git push
+
+      # Sent after the push, so a failed run does not email about changes that were not saved (the
+      # next run finds them again). If sending fails, the failure issue links to this log, which
+      # lists the changes.
+      - name: Email schedule changes
+        env:
+          SMTP_USERNAME: ${{ secrets.SMTP_USERNAME }}
+          SMTP_PASSWORD: ${{ secrets.SMTP_PASSWORD }}
+          ALERT_EMAIL_TO: ${{ secrets.ALERT_EMAIL_TO }}
+          SMTP_HOST: ${{ vars.SMTP_HOST }}
+          SMTP_PORT: ${{ vars.SMTP_PORT }}
+        run: |
+          if [ -f "$RUNNER_TEMP/changes.json" ]; then
+            python send_alert.py "$RUNNER_TEMP/changes.json"
+          else
+            echo "No schedule changes."
+          fi
+
+      - name: Send a test email
+        if: inputs.send_test_email
+        env:
+          SMTP_USERNAME: ${{ secrets.SMTP_USERNAME }}
+          SMTP_PASSWORD: ${{ secrets.SMTP_PASSWORD }}
+          ALERT_EMAIL_TO: ${{ secrets.ALERT_EMAIL_TO }}
+          SMTP_HOST: ${{ vars.SMTP_HOST }}
+          SMTP_PORT: ${{ vars.SMTP_PORT }}
+        run: python send_alert.py --test
 
       # ---- alerting -------------------------------------------------------------------------
       # On failure: open a GitHub issue (or comment on the existing one) and tell the dead man's
@@ -71,7 +103,7 @@ jobs:
 
           Failed run: $RUN_URL
 
-          Common causes: the GGWSL website is down, or its team page changed in a way the parser does not recognise (the run log names the table, row or value it could not read). This issue closes itself when a run succeeds again.
+          Common causes: the GGWSL website is down, or its team page changed in a way the parser does not recognise (the run log names the table, row or value it could not read), or the schedule-change email could not be sent (the run log lists the changes). This issue closes itself when a run succeeds again.
           BODY
           )"
           fi
