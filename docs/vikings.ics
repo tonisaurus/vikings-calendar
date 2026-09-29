@@ -496,32 +496,35 @@ TRANSP:OPAQUE
 END:VEVENT
 BEGIN:VEVENT
 UID:ggwsl-2026f-G0_KIL_VVI@vikings-calendar
-DTSTAMP:20260928T203728Z
-LAST-MODIFIED:20260928T203728Z
-SEQUENCE:1
+DTSTAMP:20260929T112646Z
+LAST-MODIFIED:20260929T112646Z
+SEQUENCE:2
 DTSTART:20260927T220000Z
 DTEND:20260927T233000Z
-SUMMARY:Killer Tomatoes (2nd\, 2-0) vs Vintage Vikings (4th\, 0-1-1)
-DESCRIPTION:Killer Tomatoes (home) vs Vintage Vikings (away)\nAlameda Estua
- ry Park\n\nStandings:\n1. Wasabi 3-0\, 9 pts\, GD +6\n2. Killer Tomatoes 2
- -0\, 6 pts\, GD +10\n3. Friends United 1-1-1\, 4 pts\, GD +0\n4. Vintage V
- ikings 0-1-1\, 1 pts\, GD -1\n5. Spitfires 0-1\, 0 pts\, GD -2\n6. Old Fla
- mes 0-2\, 0 pts\, GD -8\n\nUpdated Sep 28\, 2026 1:37 PM PDT
+SUMMARY:Killer Tomatoes 0 - 5 Vintage Vikings (W)
+DESCRIPTION:Final: Killer Tomatoes 0 - 5 Vintage Vikings (W)\nAlameda Estua
+ ry Park\n\nStandings after this game:\n1. Wasabi 3-0\, 9 pts\, GD +6\n2. K
+ iller Tomatoes 2-1\, 6 pts\, GD +5\n3. Vintage Vikings 1-1-1\, 4 pts\, GD 
+ +4\n4. Friends United 1-1-1\, 4 pts\, GD +0\n5. Spitfires 1-1\, 3 pts\, GD
+  +3\n6. Old Flames 0-2\, 0 pts\, GD -8\n\nUpdated Sep 29\, 2026 4:26 AM PD
+ T
 LOCATION:Alameda Estuary Park\, 230-200 Mosley Ave\, Alameda\, CA\, 94501
 STATUS:CONFIRMED
 TRANSP:OPAQUE
 END:VEVENT
 BEGIN:VEVENT
 UID:ggwsl-2026f-G0_SPI_VVI@vikings-calendar
-DTSTAMP:20260927T195212Z
-LAST-MODIFIED:20260927T195212Z
-SEQUENCE:0
+DTSTAMP:20260929T112646Z
+LAST-MODIFIED:20260929T112646Z
+SEQUENCE:1
 DTSTART:20261004T220000Z
 DTEND:20261004T233000Z
-SUMMARY:Spitfires vs Vintage Vikings
+SUMMARY:Spitfires (5th\, 1-1) vs Vintage Vikings (3rd\, 1-1-1)
 DESCRIPTION:Spitfires (home) vs Vintage Vikings (away)\nBeach #4 (Turf)\n\n
- Standings and records are added the week of the game.\n\nUpdated Sep 27\, 
- 2026 12:52 PM PDT
+ Standings:\n1. Wasabi 3-0\, 9 pts\, GD +6\n2. Killer Tomatoes 2-1\, 6 pts\
+ , GD +5\n3. Vintage Vikings 1-1-1\, 4 pts\, GD +4\n4. Friends United 1-1-1
+ \, 4 pts\, GD +0\n5. Spitfires 1-1\, 3 pts\, GD +3\n6. Old Flames 0-2\, 0 
+ pts\, GD -8\n\nUpdated Sep 29\, 2026 4:26 AM PDT
 LOCATION:Beach Chalet\, 1500 John F Kennedy\, Golden Gate Park\, San Franci
  sco\, CA
 STATUS:CONFIRMED
