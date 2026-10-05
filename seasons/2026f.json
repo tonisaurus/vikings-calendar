@@ -334,14 +334,14 @@
       {
         "code": "OFL",
         "draws": 0,
-        "forfeits": 0,
-        "goal_diff": -8,
-        "goals_against": 13,
+        "forfeits": 1,
+        "goal_diff": -10,
+        "goals_against": 15,
         "goals_for": 2,
         "losses": 2,
         "name": "Old Flames",
-        "played": 2,
-        "points": 0,
+        "played": 3,
+        "points": -1,
         "rank": 6,
         "wins": 0
       }
@@ -421,14 +421,14 @@
     {
       "code": "OFL",
       "draws": 0,
-      "forfeits": 0,
-      "goal_diff": -8,
-      "goals_against": 13,
+      "forfeits": 1,
+      "goal_diff": -10,
+      "goals_against": 15,
       "goals_for": 2,
       "losses": 2,
       "name": "Old Flames",
-      "played": 2,
-      "points": 0,
+      "played": 3,
+      "points": -1,
       "rank": 6,
       "wins": 0
     }
