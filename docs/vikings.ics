@@ -514,17 +514,17 @@ TRANSP:OPAQUE
 END:VEVENT
 BEGIN:VEVENT
 UID:ggwsl-2026f-G0_SPI_VVI@vikings-calendar
-DTSTAMP:20260929T112646Z
-LAST-MODIFIED:20260929T112646Z
-SEQUENCE:1
+DTSTAMP:20261005T122447Z
+LAST-MODIFIED:20261005T122447Z
+SEQUENCE:2
 DTSTART:20261004T220000Z
 DTEND:20261004T233000Z
-SUMMARY:Spitfires (5th\, 1-1) vs Vintage Vikings (3rd\, 1-1-1)
-DESCRIPTION:Spitfires (home) vs Vintage Vikings (away)\nBeach #4 (Turf)\n\n
- Standings:\n1. Wasabi 3-0\, 9 pts\, GD +6\n2. Killer Tomatoes 2-1\, 6 pts\
- , GD +5\n3. Vintage Vikings 1-1-1\, 4 pts\, GD +4\n4. Friends United 1-1-1
- \, 4 pts\, GD +0\n5. Spitfires 1-1\, 3 pts\, GD +3\n6. Old Flames 0-2\, 0 
- pts\, GD -8\n\nUpdated Sep 29\, 2026 4:26 AM PDT
+SUMMARY:Spitfires 0 - 2 Vintage Vikings (W)
+DESCRIPTION:Final: Spitfires 0 - 2 Vintage Vikings (W)\nBeach #4 (Turf)\n\n
+ Standings after this game:\n1. Killer Tomatoes 3-1\, 9 pts\, GD +7\n2. Was
+ abi 3-1\, 9 pts\, GD +4\n3. Vintage Vikings 2-1-1\, 7 pts\, GD +6\n4. Frie
+ nds United 1-1-1\, 4 pts\, GD +0\n5. Spitfires 1-2\, 3 pts\, GD +1\n6. Old
+  Flames 0-2\, 0 pts\, GD -8\n\nUpdated Oct 5\, 2026 5:24 AM PDT
 LOCATION:Beach Chalet\, 1500 John F Kennedy\, Golden Gate Park\, San Franci
  sco\, CA
 STATUS:CONFIRMED
