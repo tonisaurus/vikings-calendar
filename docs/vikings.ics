@@ -532,15 +532,17 @@ TRANSP:OPAQUE
 END:VEVENT
 BEGIN:VEVENT
 UID:ggwsl-2026f-G1_OFL_VVI@vikings-calendar
-DTSTAMP:20260927T195212Z
-LAST-MODIFIED:20260927T195212Z
-SEQUENCE:0
+DTSTAMP:20261010T184325Z
+LAST-MODIFIED:20261010T184325Z
+SEQUENCE:1
 DTSTART:20261018T160000Z
 DTEND:20261018T173000Z
-SUMMARY:Old Flames vs Vintage Vikings
+SUMMARY:Old Flames (6th\, 0-2) vs Vintage Vikings (3rd\, 2-1-1)
 DESCRIPTION:Old Flames (home) vs Vintage Vikings (away)\nBeach #4 (Turf)\n\
- nStandings and records are added the week of the game.\n\nUpdated Sep 27\,
-  2026 12:52 PM PDT
+ nStandings:\n1. Killer Tomatoes 3-1\, 9 pts\, GD +7\n2. Wasabi 3-1\, 9 pts
+ \, GD +4\n3. Vintage Vikings 2-1-1\, 7 pts\, GD +6\n4. Friends United 1-1-
+ 1\, 4 pts\, GD +0\n5. Spitfires 1-2\, 3 pts\, GD +1\n6. Old Flames 0-2\, -
+ 1 pts\, GD -10\n\nUpdated Oct 10\, 2026 11:43 AM PDT
 LOCATION:Beach Chalet\, 1500 John F Kennedy\, Golden Gate Park\, San Franci
  sco\, CA
 STATUS:CONFIRMED
