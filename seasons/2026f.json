@@ -79,10 +79,10 @@
       "home_unclear": false,
       "opponent": "Old Flames",
       "opponent_code": "OFL",
-      "our_score": null,
-      "result": "",
+      "our_score": "7",
+      "result": "W",
       "status": "scheduled",
-      "their_score": null,
+      "their_score": "1",
       "time": "09:00",
       "venue_code": "BEA"
     },
@@ -345,9 +345,109 @@
         "rank": 6,
         "wins": 0
       }
+    ],
+    "G1_OFL_VVI": [
+      {
+        "code": "VVI",
+        "draws": 1,
+        "forfeits": 0,
+        "goal_diff": 11,
+        "goals_against": 4,
+        "goals_for": 16,
+        "losses": 1,
+        "name": "Elliott's Vintage Vikings",
+        "played": 5,
+        "points": 10,
+        "rank": 1,
+        "wins": 3
+      },
+      {
+        "code": "KIL",
+        "draws": 0,
+        "forfeits": 0,
+        "goal_diff": 7,
+        "goals_against": 6,
+        "goals_for": 17,
+        "losses": 1,
+        "name": "Killer Tomatoes",
+        "played": 4,
+        "points": 9,
+        "rank": 2,
+        "wins": 3
+      },
+      {
+        "code": "WAS",
+        "draws": 0,
+        "forfeits": 0,
+        "goal_diff": 4,
+        "goals_against": 8,
+        "goals_for": 12,
+        "losses": 1,
+        "name": "Wasabi",
+        "played": 4,
+        "points": 9,
+        "rank": 3,
+        "wins": 3
+      },
+      {
+        "code": "FRU",
+        "draws": 1,
+        "forfeits": 0,
+        "goal_diff": 0,
+        "goals_against": 4,
+        "goals_for": 4,
+        "losses": 1,
+        "name": "Friends United",
+        "played": 3,
+        "points": 4,
+        "rank": 4,
+        "wins": 1
+      },
+      {
+        "code": "SPI",
+        "draws": 0,
+        "forfeits": 0,
+        "goal_diff": 1,
+        "goals_against": 4,
+        "goals_for": 6,
+        "losses": 2,
+        "name": "Spitfires",
+        "played": 3,
+        "points": 3,
+        "rank": 5,
+        "wins": 1
+      },
+      {
+        "code": "OFL",
+        "draws": 0,
+        "forfeits": 1,
+        "goal_diff": -15,
+        "goals_against": 22,
+        "goals_for": 3,
+        "losses": 3,
+        "name": "Old Flames",
+        "played": 4,
+        "points": -1,
+        "rank": 6,
+        "wins": 0
+      }
     ]
   },
   "standings": [
+    {
+      "code": "VVI",
+      "draws": 1,
+      "forfeits": 0,
+      "goal_diff": 11,
+      "goals_against": 4,
+      "goals_for": 16,
+      "losses": 1,
+      "name": "Elliott's Vintage Vikings",
+      "played": 5,
+      "points": 10,
+      "rank": 1,
+      "wins": 3
+    },
     {
       "code": "KIL",
       "draws": 0,
@@ -359,7 +459,7 @@
       "name": "Killer Tomatoes",
       "played": 4,
       "points": 9,
-      "rank": 1,
+      "rank": 2,
       "wins": 3
     },
     {
@@ -373,22 +473,8 @@
       "name": "Wasabi",
       "played": 4,
       "points": 9,
-      "rank": 2,
-      "wins": 3
-    },
-    {
-      "code": "VVI",
-      "draws": 1,
-      "forfeits": 0,
-      "goal_diff": 6,
-      "goals_against": 3,
-      "goals_for": 9,
-      "losses": 1,
-      "name": "Elliott's Vintage Vikings",
-      "played": 4,
-      "points": 7,
       "rank": 3,
-      "wins": 2
+      "wins": 3
     },
     {
       "code": "FRU",
@@ -422,12 +508,12 @@
       "code": "OFL",
       "draws": 0,
       "forfeits": 1,
-      "goal_diff": -10,
-      "goals_against": 15,
-      "goals_for": 2,
-      "losses": 2,
+      "goal_diff": -15,
+      "goals_against": 22,
+      "goals_for": 3,
+      "losses": 3,
       "name": "Old Flames",
-      "played": 3,
+      "played": 4,
       "points": -1,
       "rank": 6,
       "wins": 0
