@@ -550,17 +550,17 @@ TRANSP:OPAQUE
 END:VEVENT
 BEGIN:VEVENT
 UID:ggwsl-2026f-G0_VVI_WAS@vikings-calendar
-DTSTAMP:20261026T111841Z
-LAST-MODIFIED:20261026T111841Z
-SEQUENCE:3
+DTSTAMP:20261027T104301Z
+LAST-MODIFIED:20261027T104301Z
+SEQUENCE:4
 DTSTART:20261025T220000Z
 DTEND:20261025T233000Z
 SUMMARY:Vintage Vikings 4 - 0 Wasabi (W)
 DESCRIPTION:Final: Vintage Vikings 4 - 0 Wasabi (W)\nBeach #4 (Turf)\n\nSta
  ndings after this game:\n1. Vintage Vikings 4-1-1\, 13 pts\, GD +15\n2. Ki
- ller Tomatoes 4-1\, 12 pts\, GD +9\n3. Wasabi 3-3\, 9 pts\, GD -1\n4. Frie
- nds United 2-2-1\, 7 pts\, GD +0\n5. Spitfires 2-2\, 6 pts\, GD +2\n6. Old
-  Flames 0-3\, -1 pts\, GD -15\n\nUpdated Oct 26\, 2026 4:18 AM PDT
+ ller Tomatoes 4-1\, 12 pts\, GD +9\n3. Spitfires 3-2\, 9 pts\, GD +4\n4. W
+ asabi 3-3\, 9 pts\, GD -1\n5. Friends United 2-2-1\, 7 pts\, GD +0\n6. Old
+  Flames 0-4\, -1 pts\, GD -17\n\nUpdated Oct 27\, 2026 3:43 AM PDT
 LOCATION:Beach Chalet\, 1500 John F Kennedy\, Golden Gate Park\, San Franci
  sco\, CA
 STATUS:CONFIRMED
@@ -568,17 +568,17 @@ TRANSP:OPAQUE
 END:VEVENT
 BEGIN:VEVENT
 UID:ggwsl-2026f-G0_VVI_KIL@vikings-calendar
-DTSTAMP:20261026T111841Z
-LAST-MODIFIED:20261026T111841Z
-SEQUENCE:1
+DTSTAMP:20261027T104301Z
+LAST-MODIFIED:20261027T104301Z
+SEQUENCE:2
 DTSTART:20261101T170000Z
 DTEND:20261101T183000Z
 SUMMARY:Vintage Vikings (1st\, 4-1-1) vs Killer Tomatoes (2nd\, 4-1)
 DESCRIPTION:Vintage Vikings (home) vs Killer Tomatoes (away)\nBeach #4 (Tur
  f)\n\nStandings:\n1. Vintage Vikings 4-1-1\, 13 pts\, GD +15\n2. Killer To
- matoes 4-1\, 12 pts\, GD +9\n3. Wasabi 3-3\, 9 pts\, GD -1\n4. Friends Uni
- ted 2-2-1\, 7 pts\, GD +0\n5. Spitfires 2-2\, 6 pts\, GD +2\n6. Old Flames
-  0-3\, -1 pts\, GD -15\n\nUpdated Oct 26\, 2026 4:18 AM PDT
+ matoes 4-1\, 12 pts\, GD +9\n3. Spitfires 3-2\, 9 pts\, GD +4\n4. Wasabi 3
+ -3\, 9 pts\, GD -1\n5. Friends United 2-2-1\, 7 pts\, GD +0\n6. Old Flames
+  0-4\, -1 pts\, GD -17\n\nUpdated Oct 27\, 2026 3:43 AM PDT
 LOCATION:Beach Chalet\, 1500 John F Kennedy\, Golden Gate Park\, San Franci
  sco\, CA
 STATUS:CONFIRMED
