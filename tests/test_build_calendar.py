@@ -505,6 +505,50 @@ class ChangeTests(unittest.TestCase):
                                          "so update it by hand.\n\nCalendar and TeamSnap CSV: https://example.test/\n")
 
 
+class FetchTests(unittest.TestCase):
+    URL = "https://www.ggwsl.org/LibLeague/Team/Team.php?PARAM_TEAM_CODE=VVI"
+
+    def setUp(self):
+        urlopen = mock.patch.object(bc.urllib.request, "urlopen")
+        sleep = mock.patch.object(bc.time, "sleep")
+        self.urlopen, self.sleep = urlopen.start(), sleep.start()
+        self.addCleanup(urlopen.stop)
+        self.addCleanup(sleep.stop)
+
+    def page(self, body=b"<html>ok</html>"):
+        response = mock.MagicMock()
+        response.__enter__.return_value.read.return_value = body
+        return response
+
+    def http_error(self, code):
+        return bc.urllib.error.HTTPError(self.URL, code, "error", {}, None)
+
+    def fetch(self):
+        with redirect_stderr(io.StringIO()) as err:
+            return bc.fetch_text(self.URL), err.getvalue()
+
+    def test_backs_off_over_about_ten_minutes_then_gives_up(self):
+        self.urlopen.side_effect = TimeoutError("timed out")
+        with redirect_stderr(io.StringIO()), self.assertRaisesRegex(bc.SiteUnreachable, "5 attempts"):
+            bc.fetch_text(self.URL)
+        self.assertEqual(self.urlopen.call_count, 5)
+        self.assertEqual([c.args[0] for c in self.sleep.call_args_list], [30, 60, 120, 240])
+        self.assertEqual(self.urlopen.call_args.kwargs["timeout"], 30)
+
+    def test_recovers_when_the_site_comes_back(self):
+        self.urlopen.side_effect = [bc.urllib.error.URLError("timed out"), self.http_error(503), self.page()]
+        body, err = self.fetch()
+        self.assertEqual(body, "<html>ok</html>")
+        self.assertEqual([c.args[0] for c in self.sleep.call_args_list], [30, 60])
+        self.assertIn("retrying in 60s", err)
+
+    def test_client_error_is_raised_at_once(self):
+        self.urlopen.side_effect = self.http_error(404)
+        with self.assertRaises(bc.urllib.error.HTTPError):
+            bc.fetch_text(self.URL)
+        self.sleep.assert_not_called()
+
+
 # ---------------------------------------------------------------------------- loading
 
 
@@ -622,6 +666,15 @@ class MainTests(unittest.TestCase):
                 changes.unlink()
                 self.assertEqual(bc.main(["--config", str(self.config), "--changes-file", str(changes)]), 0)
         self.assertFalse(changes.exists())
+
+    def test_unreachable_site_exits_75_without_writing(self):
+        def unreachable(url):
+            raise bc.SiteUnreachable(f"{url} did not answer in 5 attempts (timed out)")
+        code, err = self.run_main(unreachable)
+        self.assertEqual(code, bc.UNREACHABLE_EXIT)
+        self.assertIn("league site is unreachable", err)
+        self.assertFalse((self.root / "docs").exists())
+        self.assertFalse((self.root / "state.json").exists())
 
     def test_broken_page_fails_without_writing(self):
         code, err = self.run_main(FakeSite({CURRENT_URL: "<html>maintenance</html>"}))

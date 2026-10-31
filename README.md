@@ -56,8 +56,11 @@ for (after any team it ties with). Our group's own order is kept exactly as the 
 - [`.github/workflows/update-calendar.yml`](.github/workflows/update-calendar.yml) runs the script three times
   a day (05:23, 14:23 and 20:23 UTC; the first is Sunday night Pacific, when game scores are usually in), and
   on any change to the config or script, then commits the result. GitHub Pages serves the `docs/` folder.
-- If the site is unreachable the run retries a few times, then fails without committing, so subscribers keep
-  the last good calendar. A run that would publish an empty calendar fails the same way.
+- The league's server sometimes stops answering for a few minutes. A request that times out, hits a network
+  error or gets a 5xx error page is retried after 30 seconds, then 1, 2 and 4 minutes (five tries over about
+  10 minutes). If the site still has not answered, the run writes nothing and ends without an alert; the next
+  run tries again, and subscribers keep the last good calendar meanwhile. A run that would publish an empty
+  calendar fails without writing anything too, and that one does alert.
 
 ## TeamSnap
 
@@ -92,10 +95,12 @@ from the Actions tab with "Also send a test schedule-change email" ticked.
 ## Alerting
 
 - A failed run opens a GitHub issue labelled `calendar-alert` (or comments on the open one) with a link to
-  the run log, and the next successful run closes it.
+  the run log, and the next successful run closes it. A run that only could not reach the site is not a
+  failure: it neither opens nor closes the issue.
 - Each run pings a [healthchecks.io](https://healthchecks.io) check stored in the `HEALTHCHECK_URL`
-  repository secret: success pings `$URL`, failure pings `$URL/fail`. If no ping arrives for a day,
-  healthchecks.io emails the owner. This also catches GitHub silently disabling the schedule, which it does
+  repository secret: success pings `$URL`, failure pings `$URL/fail`, and a run that could not reach the site
+  only adds a note to the check's log (`$URL/log`). If no success ping arrives for a day, healthchecks.io
+  emails the owner, which is how a site outage longer than a day gets noticed. This also catches GitHub silently disabling the schedule, which it does
   after 60 days without commits; re-enable it from the Actions tab if that happens.
 
 ## Next season

@@ -478,27 +478,39 @@ def parse_venue(html: str, venue_code: str) -> Venue | None:
 # ------------------------------------------------------------------------ fetching
 
 
-FETCH_ATTEMPTS = 3
-FETCH_BACKOFF_SECONDS = 5
+# The league's server sometimes stops answering for a few minutes. When a request fails, wait
+# 30 seconds, then 1, 2 and 4 minutes between tries: five attempts over about 10 minutes, easing off
+# so a struggling server is not hammered.
+FETCH_DELAYS_SECONDS = (30, 60, 120, 240)
+FETCH_TIMEOUT_SECONDS = 30
+UNREACHABLE_EXIT = 75  # EX_TEMPFAIL: the site did not answer; try again later
+
+
+class SiteUnreachable(Exception):
+    """The league site did not answer (network error, timeout or a 5xx error page) on any attempt."""
+
 USER_AGENT = "vikings-calendar/1.0 (+https://github.com/tonisaurus/vikings-calendar)"
 
 
 def fetch_text(url: str) -> str:
-    """GET a page, retrying transient failures (network errors, 5xx) with backoff."""
+    """GET a page, retrying transient failures (network errors, timeouts, 5xx) with backoff.
+
+    A 4xx response is raised at once: it means the URL is wrong, and waiting will not fix that.
+    Raises SiteUnreachable when every attempt fails.
+    """
     request = urllib.request.Request(url, headers={"User-Agent": USER_AGENT})
-    for attempt in range(1, FETCH_ATTEMPTS + 1):
+    for attempt, delay in enumerate((*FETCH_DELAYS_SECONDS, None), start=1):
         try:
-            with urllib.request.urlopen(request, timeout=30) as response:
+            with urllib.request.urlopen(request, timeout=FETCH_TIMEOUT_SECONDS) as response:
                 return response.read().decode("utf-8", errors="replace")
         except urllib.error.HTTPError as exc:
-            if exc.code < 500 or attempt == FETCH_ATTEMPTS:
+            if exc.code < 500:
                 raise
-            error = exc
+            error: Exception = exc
         except (urllib.error.URLError, TimeoutError, OSError) as exc:
-            if attempt == FETCH_ATTEMPTS:
-                raise
             error = exc
-        delay = FETCH_BACKOFF_SECONDS * attempt
+        if delay is None:
+            raise SiteUnreachable(f"{url} did not answer in {attempt} attempts ({error})") from error
         print(f"warning: {url} failed ({error}); retrying in {delay}s", file=sys.stderr)
         time.sleep(delay)
     raise AssertionError("unreachable")
@@ -1015,6 +1027,10 @@ def main(argv: list[str] | None = None) -> int:
     try:
         seasons, stale = load_seasons(config, cached, today, tz)
         venues = load_venues(config, load_json(venues_path), [g for s in seasons for g in s.games])
+    except SiteUnreachable as exc:
+        # Not a breakage: nothing is written, and the next run tries again.
+        print(f"warning: the league site is unreachable, so nothing was updated: {exc}", file=sys.stderr)
+        return UNREACHABLE_EXIT
     except (urllib.error.URLError, PageError) as exc:
         print(f"error: failed to read the league site: {exc}", file=sys.stderr)
         return 1

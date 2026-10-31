@@ -41,8 +41,20 @@ jobs:
         with:
           python-version: "3.12"
 
+      # Exit code 75 means the league site did not answer for about 10 minutes of retries. Nothing
+      # was written and nothing is broken, so the run ends without an alert and the next one tries
+      # again. If the site stays down for a day, the healthcheck below emails the owner.
       - name: Build calendar from the GGWSL website
-        run: python build_calendar.py --changes-file "$RUNNER_TEMP/changes.json"
+        id: build
+        run: |
+          status=0
+          python build_calendar.py --changes-file "$RUNNER_TEMP/changes.json" || status=$?
+          if [ "$status" = 75 ]; then
+            echo "::warning::The league site did not answer, so nothing was updated. The next run will try again."
+            echo "unreachable=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          exit "$status"
 
       - name: Commit and push if anything changed
         run: |
@@ -103,13 +115,14 @@ jobs:
 
           Failed run: $RUN_URL
 
-          Common causes: the GGWSL website is down, or its team page changed in a way the parser does not recognise (the run log names the table, row or value it could not read), or the schedule-change email could not be sent (the run log lists the changes). This issue closes itself when a run succeeds again.
+          Common causes: the GGWSL website returned an error page, or its team page changed in a way the parser does not recognise (the run log names the table, row or value it could not read), or the schedule-change email could not be sent (the run log lists the changes). A site that is only unreachable does not open this issue. This issue closes itself when a run succeeds again.
           BODY
           )"
           fi
 
+      # A run that could not reach the site proves nothing about an open problem, so it leaves the issue open.
       - name: Close the failure issue after a successful run
-        if: success()
+        if: success() && steps.build.outputs.unreachable != 'true'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
@@ -122,9 +135,17 @@ jobs:
         env:
           HEALTHCHECK_URL: ${{ secrets.HEALTHCHECK_URL }}
           OUTCOME: ${{ job.status }}
+          UNREACHABLE: ${{ steps.build.outputs.unreachable }}
         run: |
           if [ -z "$HEALTHCHECK_URL" ]; then
             echo "HEALTHCHECK_URL secret not set; skipping."
+            exit 0
+          fi
+          # Neither success nor failure: record it in the check's log without changing its state, so
+          # only a full day without a successful run sends an email.
+          if [ "$UNREACHABLE" = "true" ]; then
+            curl -fsS -m 10 --retry 3 -o /dev/null --data-raw "League site unreachable: $RUN_URL" "$HEALTHCHECK_URL/log" \
+              || echo "Could not log to the healthcheck; ignoring."
             exit 0
           fi
           suffix=""
