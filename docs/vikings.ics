@@ -587,17 +587,17 @@ TRANSP:OPAQUE
 END:VEVENT
 BEGIN:VEVENT
 UID:ggwsl-2026f-G0_OFL_VVI@vikings-calendar
-DTSTAMP:20261104T130732Z
-LAST-MODIFIED:20261104T130732Z
-SEQUENCE:3
+DTSTAMP:20261108T234936Z
+LAST-MODIFIED:20261108T234936Z
+SEQUENCE:4
 DTSTART:20261108T210000Z
 DTEND:20261108T223000Z
 SUMMARY:Old Flames (6th\, 0-4-1) vs Vintage Vikings (1st\, 5-1-1)
 DESCRIPTION:Old Flames (home) vs Vintage Vikings (away)\nBeach #4 (Turf)\n\
  nStandings:\n1. Vintage Vikings 5-1-1\, 16 pts\, GD +16\n2. Killer Tomatoe
- s 4-2\, 12 pts\, GD +8\n3. Spitfires 3-2-1\, 10 pts\, GD +4\n4. Friends Un
- ited 3-2-1\, 10 pts\, GD +2\n5. Wasabi 3-4\, 9 pts\, GD -3\n6. Old Flames 
- 0-4-1\, 0 pts\, GD -17\n\nUpdated Nov 4\, 2026 5:07 AM PST
+ s 4-2-1\, 13 pts\, GD +8\n3. Friends United 3-2-2\, 11 pts\, GD +2\n4. Spi
+ tfires 3-2-1\, 10 pts\, GD +4\n5. Wasabi 3-4\, 9 pts\, GD -3\n6. Old Flame
+ s 0-4-1\, 0 pts\, GD -17\n\nUpdated Nov 8\, 2026 3:49 PM PST
 LOCATION:Beach Chalet\, 1500 John F Kennedy\, Golden Gate Park\, San Franci
  sco\, CA
 STATUS:CONFIRMED
