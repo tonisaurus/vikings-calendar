@@ -587,17 +587,18 @@ TRANSP:OPAQUE
 END:VEVENT
 BEGIN:VEVENT
 UID:ggwsl-2026f-G0_OFL_VVI@vikings-calendar
-DTSTAMP:20261108T234936Z
-LAST-MODIFIED:20261108T234936Z
-SEQUENCE:4
+DTSTAMP:20261109T140558Z
+LAST-MODIFIED:20261109T140558Z
+SEQUENCE:5
 DTSTART:20261108T210000Z
 DTEND:20261108T223000Z
-SUMMARY:Old Flames (6th\, 0-4-1) vs Vintage Vikings (1st\, 5-1-1)
-DESCRIPTION:Old Flames (home) vs Vintage Vikings (away)\nBeach #4 (Turf)\n\
- nStandings:\n1. Vintage Vikings 5-1-1\, 16 pts\, GD +16\n2. Killer Tomatoe
- s 4-2-1\, 13 pts\, GD +8\n3. Friends United 3-2-2\, 11 pts\, GD +2\n4. Spi
- tfires 3-2-1\, 10 pts\, GD +4\n5. Wasabi 3-4\, 9 pts\, GD -3\n6. Old Flame
- s 0-4-1\, 0 pts\, GD -17\n\nUpdated Nov 8\, 2026 3:49 PM PST
+SUMMARY:Old Flames 3 - 7 Vintage Vikings (W)
+DESCRIPTION:Final: Old Flames 3 - 7 Vintage Vikings (W)\nBeach #4 (Turf)\n\
+ nStandings after this game:\n1. Vintage Vikings 6-1-1\, 19 pts\, GD +20\n2
+ . Killer Tomatoes 4-2-1\, 13 pts\, GD +8\n3. Wasabi 4-4\, 12 pts\, GD -2\n
+ 4. Friends United 3-2-2\, 11 pts\, GD +2\n5. Spitfires 3-3-1\, 10 pts\, GD
+  +3\n6. Old Flames 0-5-1\, 0 pts\, GD -21\n\nUpdated Nov 9\, 2026 6:05 AM 
+ PST
 LOCATION:Beach Chalet\, 1500 John F Kennedy\, Golden Gate Park\, San Franci
  sco\, CA
 STATUS:CONFIRMED
@@ -605,15 +606,17 @@ TRANSP:OPAQUE
 END:VEVENT
 BEGIN:VEVENT
 UID:ggwsl-2026f-G1_VVI_FRU@vikings-calendar
-DTSTAMP:20260927T195212Z
-LAST-MODIFIED:20260927T195212Z
-SEQUENCE:0
+DTSTAMP:20261109T140558Z
+LAST-MODIFIED:20261109T140558Z
+SEQUENCE:1
 DTSTART:20261115T190000Z
 DTEND:20261115T203000Z
-SUMMARY:Vintage Vikings vs Friends United
+SUMMARY:Vintage Vikings (1st\, 6-1-1) vs Friends United (4th\, 3-2-2)
 DESCRIPTION:Vintage Vikings (home) vs Friends United (away)\nBeach #4 (Turf
- )\n\nStandings and records are added the week of the game.\n\nUpdated Sep 
- 27\, 2026 12:52 PM PDT
+ )\n\nStandings:\n1. Vintage Vikings 6-1-1\, 19 pts\, GD +20\n2. Killer Tom
+ atoes 4-2-1\, 13 pts\, GD +8\n3. Wasabi 4-4\, 12 pts\, GD -2\n4. Friends U
+ nited 3-2-2\, 11 pts\, GD +2\n5. Spitfires 3-3-1\, 10 pts\, GD +3\n6. Old 
+ Flames 0-5-1\, 0 pts\, GD -21\n\nUpdated Nov 9\, 2026 6:05 AM PST
 LOCATION:Beach Chalet\, 1500 John F Kennedy\, Golden Gate Park\, San Franci
  sco\, CA
 STATUS:CONFIRMED
