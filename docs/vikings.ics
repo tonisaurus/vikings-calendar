@@ -606,18 +606,18 @@ TRANSP:OPAQUE
 END:VEVENT
 BEGIN:VEVENT
 UID:ggwsl-2026f-G1_VVI_FRU@vikings-calendar
-DTSTAMP:20261116T135047Z
-LAST-MODIFIED:20261116T135047Z
-SEQUENCE:2
+DTSTAMP:20261117T144251Z
+LAST-MODIFIED:20261117T144251Z
+SEQUENCE:3
 DTSTART:20261115T190000Z
 DTEND:20261115T203000Z
 SUMMARY:Vintage Vikings 0 - 1 Friends United (L)
 DESCRIPTION:Final: Vintage Vikings 0 - 1 Friends United (L)\nBeach #4 (Turf
  )\n\nStandings after this game:\n1. Vintage Vikings 6-2-1\, 19 pts\, GD +1
- 9\n2. Killer Tomatoes 5-2-1\, 16 pts\, GD +11\n3. Friends United 4-2-2\, 1
- 4 pts\, GD +3\n4. Wasabi 4-4\, 12 pts\, GD -2\n5. Spitfires 3-4-1\, 10 pts
- \, GD +0\n6. Old Flames 0-5-1\, 0 pts\, GD -21\n\nUpdated Nov 16\, 2026 5:
- 50 AM PST
+ 9\n2. Killer Tomatoes 5-2-1\, 16 pts\, GD +11\n3. Wasabi 5-4\, 15 pts\, GD
+  +3\n4. Friends United 4-2-2\, 14 pts\, GD +3\n5. Spitfires 3-4-1\, 10 pts
+ \, GD +0\n6. Old Flames 0-6-1\, 0 pts\, GD -26\n\nUpdated Nov 17\, 2026 6:
+ 42 AM PST
 LOCATION:Beach Chalet\, 1500 John F Kennedy\, Golden Gate Park\, San Franci
  sco\, CA
 STATUS:CONFIRMED
@@ -625,17 +625,17 @@ TRANSP:OPAQUE
 END:VEVENT
 BEGIN:VEVENT
 UID:ggwsl-2026f-G1_VVI_SPI@vikings-calendar
-DTSTAMP:20261116T135047Z
-LAST-MODIFIED:20261116T135047Z
-SEQUENCE:1
+DTSTAMP:20261117T144251Z
+LAST-MODIFIED:20261117T144251Z
+SEQUENCE:2
 DTSTART:20261122T230000Z
 DTEND:20261123T003000Z
 SUMMARY:Vintage Vikings (1st\, 6-2-1) vs Spitfires (5th\, 3-4-1)
 DESCRIPTION:Vintage Vikings (home) vs Spitfires (away)\nBeach #4 (Turf)\n\n
  Standings:\n1. Vintage Vikings 6-2-1\, 19 pts\, GD +19\n2. Killer Tomatoes
-  5-2-1\, 16 pts\, GD +11\n3. Friends United 4-2-2\, 14 pts\, GD +3\n4. Was
- abi 4-4\, 12 pts\, GD -2\n5. Spitfires 3-4-1\, 10 pts\, GD +0\n6. Old Flam
- es 0-5-1\, 0 pts\, GD -21\n\nUpdated Nov 16\, 2026 5:50 AM PST
+  5-2-1\, 16 pts\, GD +11\n3. Wasabi 5-4\, 15 pts\, GD +3\n4. Friends Unite
+ d 4-2-2\, 14 pts\, GD +3\n5. Spitfires 3-4-1\, 10 pts\, GD +0\n6. Old Flam
+ es 0-6-1\, 0 pts\, GD -26\n\nUpdated Nov 17\, 2026 6:42 AM PST
 LOCATION:Beach Chalet\, 1500 John F Kennedy\, Golden Gate Park\, San Franci
  sco\, CA
 STATUS:CONFIRMED
