@@ -625,14 +625,18 @@ TRANSP:OPAQUE
 END:VEVENT
 BEGIN:VEVENT
 UID:ggwsl-2026f-G1_VVI_SPI@vikings-calendar
-DTSTAMP:20261124T045140Z
-LAST-MODIFIED:20261124T045140Z
-SEQUENCE:4
+DTSTAMP:20261124T160148Z
+LAST-MODIFIED:20261124T160148Z
+SEQUENCE:5
 DTSTART:20261122T230000Z
 DTEND:20261123T003000Z
-SUMMARY:Vintage Vikings vs Spitfires
-DESCRIPTION:Vintage Vikings (home) vs Spitfires (away)\nBeach #4 (Turf)\n\n
- Result not posted yet.\n\nUpdated Nov 23\, 2026 8:51 PM PST
+SUMMARY:Vintage Vikings 2 - 3 Spitfires (L)
+DESCRIPTION:Final: Vintage Vikings 2 - 3 Spitfires (L)\nBeach #4 (Turf)\n\n
+ Standings after this game:\n1. Vintage Vikings 6-3-1\, 19 pts\, GD +18\n2.
+  Killer Tomatoes 5-2-2\, 17 pts\, GD +11\n3. Wasabi 5-4-1\, 16 pts\, GD +3
+ \n4. Friends United 4-2-2\, 14 pts\, GD +3\n5. Spitfires 4-4-1\, 13 pts\, 
+ GD +1\n6. Old Flames 0-6-1\, 0 pts\, GD -26\n\nUpdated Nov 24\, 2026 8:01 
+ AM PST
 LOCATION:Beach Chalet\, 1500 John F Kennedy\, Golden Gate Park\, San Franci
  sco\, CA
 STATUS:CONFIRMED
