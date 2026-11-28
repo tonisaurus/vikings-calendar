@@ -806,6 +806,20 @@
         "wins": 5
       },
       {
+        "code": "FRU",
+        "draws": 2,
+        "forfeits": 0,
+        "goal_diff": 5,
+        "goals_against": 12,
+        "goals_for": 17,
+        "losses": 2,
+        "name": "Friends United",
+        "played": 9,
+        "points": 17,
+        "rank": 3,
+        "wins": 5
+      },
+      {
         "code": "WAS",
         "draws": 1,
         "forfeits": 0,
@@ -816,22 +830,8 @@
         "name": "Wasabi",
         "played": 10,
         "points": 16,
-        "rank": 3,
-        "wins": 5
-      },
-      {
-        "code": "FRU",
-        "draws": 2,
-        "forfeits": 0,
-        "goal_diff": 3,
-        "goals_against": 10,
-        "goals_for": 13,
-        "losses": 2,
-        "name": "Friends United",
-        "played": 8,
-        "points": 14,
         "rank": 4,
-        "wins": 4
+        "wins": 5
       },
       {
         "code": "SPI",
@@ -851,12 +851,12 @@
         "code": "OFL",
         "draws": 1,
         "forfeits": 1,
-        "goal_diff": -26,
-        "goals_against": 39,
-        "goals_for": 9,
-        "losses": 6,
+        "goal_diff": -28,
+        "goals_against": 43,
+        "goals_for": 11,
+        "losses": 7,
         "name": "Old Flames",
-        "played": 8,
+        "played": 9,
         "points": 0,
         "rank": 6,
         "wins": 0
@@ -893,6 +893,20 @@
       "wins": 5
     },
     {
+      "code": "FRU",
+      "draws": 2,
+      "forfeits": 0,
+      "goal_diff": 5,
+      "goals_against": 12,
+      "goals_for": 17,
+      "losses": 2,
+      "name": "Friends United",
+      "played": 9,
+      "points": 17,
+      "rank": 3,
+      "wins": 5
+    },
+    {
       "code": "WAS",
       "draws": 1,
       "forfeits": 0,
@@ -903,22 +917,8 @@
       "name": "Wasabi",
       "played": 10,
       "points": 16,
-      "rank": 3,
-      "wins": 5
-    },
-    {
-      "code": "FRU",
-      "draws": 2,
-      "forfeits": 0,
-      "goal_diff": 3,
-      "goals_against": 10,
-      "goals_for": 13,
-      "losses": 2,
-      "name": "Friends United",
-      "played": 8,
-      "points": 14,
       "rank": 4,
-      "wins": 4
+      "wins": 5
     },
     {
       "code": "SPI",
@@ -938,12 +938,12 @@
       "code": "OFL",
       "draws": 1,
       "forfeits": 1,
-      "goal_diff": -26,
-      "goals_against": 39,
-      "goals_for": 9,
-      "losses": 6,
+      "goal_diff": -28,
+      "goals_against": 43,
+      "goals_for": 11,
+      "losses": 7,
       "name": "Old Flames",
-      "played": 8,
+      "played": 9,
       "points": 0,
       "rank": 6,
       "wins": 0
